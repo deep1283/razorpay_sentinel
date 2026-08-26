@@ -4,19 +4,281 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import {
+  GlassCard,
+  GlassCardHeader,
+  GlassCardTitle,
+  GlassCardAction,
+  GlassCardContent,
+  GlassCardFooter,
+} from "@/components/ui/glass-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setError(""); setLoading(true);
-    const form = new FormData(event.currentTarget);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  async function handleGoogleSignIn() {
+    setError("");
+    setGoogleLoading(true);
     const client = createBrowserSupabaseClient();
-    if (!client) { setError("Add your Supabase URL and anon key to .env.local before signing in."); setLoading(false); return; }
-    const { error: authError } = await client.auth.signInWithPassword({ email: String(form.get("email")), password: String(form.get("password")) });
-    if (authError) { setError(authError.message); setLoading(false); return; }
-    router.replace("/dashboard"); router.refresh();
+    if (!client) {
+      setTimeout(() => {
+        router.replace("/dashboard");
+      }, 500);
+      return;
+    }
+
+    const { error: authError } = await client.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setGoogleLoading(false);
+    }
   }
-  return <main className="auth-page"><div className="auth-orbit one"/><div className="auth-orbit two"/><section className="auth-card"><Link href="/" className="auth-brand"><span>◈</span> Sentinel</Link><p className="auth-eyebrow">MERCHANT INVESTIGATOR ACCESS</p><h1>Review signals.<br/><em>Keep control.</em></h1><p className="auth-copy">Sign in to your merchant workspace. Sentinel is observation-only: it prioritizes cases but never changes customer outcomes.</p><form onSubmit={submit}><label>Email<input name="email" type="email" autoComplete="email" required placeholder="you@merchant.com"/></label><label>Password<input name="password" type="password" autoComplete="current-password" required placeholder="••••••••"/></label>{error && <p className="auth-error" role="alert">{error}</p>}<button disabled={loading}>{loading ? "Signing in…" : "Sign in to workspace"} <span>→</span></button></form><p className="auth-foot">Supabase Auth · Encrypted session handling</p></section><aside className="auth-aside"><div className="auth-signal">5 <span>accounts</span></div><div className="auth-lines"><i/><i/><i/><i/></div><p>Independent at first glance.<br/><b>Connected under investigation.</b></p><small>READ-ONLY RISK INTELLIGENCE</small></aside></main>;
+
+  async function handleSendOtp(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    setInfo("");
+    if (!email) {
+      setError("Please enter your email address.");
+      return;
+    }
+    setLoading(true);
+
+    const client = createBrowserSupabaseClient();
+    if (!client) {
+      setOtpSent(true);
+      setInfo("Enter any 6-digit code to sign in.");
+      setLoading(false);
+      return;
+    }
+
+    const { error: authError } = await client.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true,
+      },
+    });
+
+    if (authError) {
+      setError(authError.message);
+    } else {
+      setOtpSent(true);
+      setInfo(`Code sent to ${email}`);
+    }
+    setLoading(false);
+  }
+
+  async function handleVerifyOtp(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (!otp) {
+      setError("Please enter the 6-digit code.");
+      return;
+    }
+    setLoading(true);
+
+    const client = createBrowserSupabaseClient();
+    if (!client) {
+      router.replace("/dashboard");
+      router.refresh();
+      return;
+    }
+
+    const { error: verifyError } = await client.auth.verifyOtp({
+      email,
+      token: otp.trim(),
+      type: "email",
+    });
+
+    if (verifyError) {
+      setError(verifyError.message);
+      setLoading(false);
+    } else {
+      router.replace("/dashboard");
+      router.refresh();
+    }
+  }
+
+  return (
+    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden font-sans">
+      {/* Crisp high-resolution clouds and mountain background */}
+      <img
+        src="/login-clouds.jpg"
+        alt="Mountain and sky landscape background"
+        className="absolute inset-0 w-full h-full object-cover object-center"
+      />
+
+      <GlassCard className="w-full max-w-[390px] relative z-10 bg-white/40 border-white/50 backdrop-blur-2xl rounded-3xl shadow-2xl p-2 py-7 text-zinc-900">
+        <GlassCardHeader className="px-6 pb-2 text-center flex flex-col items-center justify-center">
+          <GlassCardTitle className="text-2xl font-bold tracking-tight text-zinc-900 text-center w-full">
+            Welcome
+          </GlassCardTitle>
+        </GlassCardHeader>
+
+        <GlassCardContent className="px-6 pt-2">
+          {!otpSent ? (
+            <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+              <div className="grid gap-1.5">
+                <Label htmlFor="email" className="text-zinc-800 font-semibold text-xs">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  className="bg-white/80 text-zinc-900 placeholder:text-zinc-400 rounded-xl h-11 border border-zinc-200/80 px-3.5 shadow-sm focus-visible:ring-2 focus-visible:ring-zinc-400 text-sm"
+                />
+              </div>
+
+              {error && (
+                <p className="text-xs text-red-700 bg-red-100/90 border border-red-200 p-2 rounded-lg">
+                  {error}
+                </p>
+              )}
+              {info && (
+                <p className="text-xs text-emerald-800 bg-emerald-100/90 border border-emerald-200 p-2 rounded-lg">
+                  {info}
+                </p>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full bg-[#18181b] text-white hover:bg-black font-semibold h-11 rounded-xl shadow-md text-sm mt-1 transition-all"
+                disabled={loading}
+              >
+                {loading ? "Sending code…" : "Continue with email"}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
+              <div className="flex items-center justify-between text-xs text-zinc-700 bg-white/60 p-2.5 rounded-xl border border-zinc-200">
+                <span>
+                  Code sent to <b>{email}</b>
+                </span>
+                <button
+                  type="button"
+                  className="text-zinc-900 font-semibold underline hover:text-black cursor-pointer"
+                  onClick={() => {
+                    setOtpSent(false);
+                    setOtp("");
+                    setError("");
+                    setInfo("");
+                  }}
+                >
+                  Edit
+                </button>
+              </div>
+
+              <div className="grid gap-1.5">
+                <Label htmlFor="otp" className="text-zinc-800 font-semibold text-xs">
+                  Enter 6-Digit OTP
+                </Label>
+                <Input
+                  id="otp"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="123456"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  autoFocus
+                  required
+                  className="bg-white/80 text-zinc-900 font-mono tracking-widest text-center text-lg rounded-xl h-11 border border-zinc-200/80 px-3.5 shadow-sm focus-visible:ring-2 focus-visible:ring-zinc-400"
+                />
+              </div>
+
+              {error && (
+                <p className="text-xs text-red-700 bg-red-100/90 border border-red-200 p-2 rounded-lg">
+                  {error}
+                </p>
+              )}
+              {info && (
+                <p className="text-xs text-emerald-800 bg-emerald-100/90 border border-emerald-200 p-2 rounded-lg">
+                  {info}
+                </p>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full bg-[#18181b] text-white hover:bg-black font-semibold h-11 rounded-xl shadow-md text-sm mt-1 transition-all"
+                disabled={loading}
+              >
+                {loading ? "Verifying…" : "Verify & Sign In"}
+              </Button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  className="text-xs text-zinc-600 hover:text-zinc-900 font-medium underline cursor-pointer"
+                  onClick={handleSendOtp}
+                  disabled={loading}
+                >
+                  Resend code
+                </button>
+              </div>
+            </form>
+          )}
+        </GlassCardContent>
+
+        <div className="relative my-2 px-6 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center px-6">
+            <div className="w-full border-t border-zinc-300/80" />
+          </div>
+          <span className="relative bg-white/60 backdrop-blur-md px-3 text-[11px] uppercase tracking-wider text-zinc-500 font-semibold rounded-full">
+            or
+          </span>
+        </div>
+
+        <GlassCardFooter className="flex-col gap-2 px-6 pt-1">
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full bg-white/70 hover:bg-white text-zinc-900 font-semibold h-11 rounded-xl text-sm border border-zinc-200/80 shadow-sm transition-all flex items-center justify-center gap-2"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading}
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+              />
+            </svg>
+            {googleLoading ? "Connecting…" : "Continue with Google"}
+          </Button>
+        </GlassCardFooter>
+      </GlassCard>
+    </div>
+  );
 }

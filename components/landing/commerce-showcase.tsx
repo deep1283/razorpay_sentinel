@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const journeys = [
   {
@@ -53,6 +53,18 @@ function SignalVisual({ type }: { type: string }) {
 
 export function CommerceShowcase() {
   const [active, setActive] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
+      setActive((prev) => (prev + 1) % journeys.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
   const journey = journeys[active];
 
   return (
@@ -62,18 +74,39 @@ export function CommerceShowcase() {
         <div className="primer-proof-logos"><b>Razorpay</b><b>commerce</b><b>growth</b><b>risk ops</b><b>payments</b></div>
       </section>
 
-      <section className="primer-journeys" id="features">
+      <section
+        className="primer-journeys"
+        id="features"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         <div className="primer-tabs" role="tablist" aria-label="Sentinel capabilities">
-          {journeys.map((item, index) => <button key={item.label} type="button" role="tab" aria-selected={active === index} className={active === index ? "active" : ""} onClick={() => setActive(index)}>{item.label}</button>)}
+          {journeys.map((item, index) => (
+            <button
+              key={item.label}
+              type="button"
+              role="tab"
+              aria-selected={active === index}
+              className={active === index ? "active" : ""}
+              onClick={() => setActive(index)}
+              onFocus={() => setIsPaused(true)}
+              onBlur={() => setIsPaused(false)}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
         <div className="primer-stage">
-          <div className="primer-stage-copy">
+          <div key={`copy-${active}`} className="primer-stage-copy primer-fade-in">
             <span>{journey.eyebrow}</span>
             <h2>{journey.title}</h2>
             <p>{journey.body}</p>
             <Link href="/dashboard" className="primer-outline-link">Explore the live workspace <b>→</b></Link>
           </div>
-          <div className="primer-stage-visual"><SignalVisual type={journey.panel} /><div className="primer-stage-stat"><span>{journey.metric}</span><i>↗</i></div></div>
+          <div key={`visual-${active}`} className="primer-stage-visual primer-fade-in">
+            <SignalVisual type={journey.panel} />
+            <div className="primer-stage-stat"><span>{journey.metric}</span><i>↗</i></div>
+          </div>
         </div>
       </section>
 

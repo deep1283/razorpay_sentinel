@@ -7,22 +7,22 @@ export function GraphEngineSection() {
 
   const steps = [
     {
-      title: "1. Signal Ingestion",
-      tag: "WEBHOOK STREAM",
-      desc: "Razorpay webhooks stream transaction events (`payment.captured`, `order.paid`) containing device signatures, hashed card tokens, IP ranges, and shipping destinations.",
-      detail: "Normalized and parsed into distinct identity entities in sub-millisecond pipelines.",
+      title: "1. Webhook Signal Ingestion",
+      tag: "STEP 1",
+      desc: "Razorpay webhooks stream payment events containing device signatures, hashed card tokens, IP subnets, and delivery addresses directly to Sentinel's passive listener.",
+      detail: "Normalized into structured identity entities in sub-millisecond pipelines.",
     },
     {
       title: "2. Graph Construction & Linking",
-      tag: "COMMUNITY DETECTION",
-      desc: "Entities form nodes in an in-memory graph. When two separate customer accounts share a payment instrument or device, an edge is created with weighted confidence.",
-      detail: "Connected components and Louvain clustering automatically isolate emerging abuse rings.",
+      tag: "STEP 2",
+      desc: "Entities form nodes in an in-memory graph. When two separate customer accounts share a payment instrument, device, or shipping address, a weighted edge is established.",
+      detail: "Connected components and Louvain community detection isolate emerging abuse clusters.",
     },
     {
-      title: "3. Risk Scoring & Case Dispatch",
-      tag: "INVESTIGATOR WORKSPACE",
-      desc: "Sentinel computes a ring-level risk score based on promo usage density, velocity, and multi-account count, instantly generating an actionable case for your fraud analysts.",
-      detail: "Includes full natural language explanations powered by LLM synthesis.",
+      title: "3. Case Dispatch & Explainable Evidence",
+      tag: "STEP 3",
+      desc: "Sentinel computes a ring-level risk score and automatically dispatches an organized investigation case with natural language summaries and full evidence trails.",
+      detail: "Merchant fraud analysts review the visual graph and make the final decision.",
     },
   ];
 
@@ -35,11 +35,11 @@ export function GraphEngineSection() {
             How we build the abuse graph
           </h2>
           <p className="section-subtitle text-slate-300">
-            From raw transaction webhooks to a connected intelligence graph in milliseconds.
+            From raw transaction webhooks to an interconnected fraud intelligence graph in milliseconds.
           </p>
         </div>
 
-        {/* Interactive Step-by-Step Architecture */}
+        {/* Step-by-Step Architecture */}
         <div className="graph-steps-container">
           <div className="graph-step-tabs">
             {steps.map((step, idx) => (
@@ -69,45 +69,45 @@ export function GraphEngineSection() {
               </div>
             </div>
 
-            {/* Interactive Graph Node Schematic Visual */}
+            {/* Clean, Non-Neon SVG Graph Diagram */}
             <div className="graph-schematic-visual">
               <div className="schematic-header">
-                <span>SENTINEL IN-MEMORY GRAPH</span>
-                <span className="live-status">● LIVE ENGINE</span>
+                <span>GRAPH TOPOLOGY VIEW</span>
+                <span className="live-status">PASSIVE INGESTION ACTIVE</span>
               </div>
               <div className="schematic-canvas">
                 {/* Node cluster */}
                 <div className="node-item account n1">
-                  <span className="node-icon">👤</span>
-                  <span className="node-name">Acc #912</span>
+                  <span className="node-dot" />
+                  <span className="node-name">User #912</span>
                 </div>
                 <div className="node-item device n2">
-                  <span className="node-icon">📱</span>
-                  <span className="node-name">Device_Canvas_88</span>
+                  <span className="node-dot" />
+                  <span className="node-name">Device_iOS_A48</span>
                 </div>
                 <div className="node-item account n3">
-                  <span className="node-icon">👤</span>
-                  <span className="node-name">Acc #441</span>
+                  <span className="node-dot" />
+                  <span className="node-name">User #441</span>
                 </div>
                 <div className="node-item card n4">
-                  <span className="node-icon">💳</span>
-                  <span className="node-name">Card_4111_XX</span>
+                  <span className="node-dot" />
+                  <span className="node-name">Card_Visa_4911</span>
                 </div>
                 <div className="node-item promo n5">
-                  <span className="node-icon">🏷️</span>
-                  <span className="node-name">SAVE50</span>
+                  <span className="node-dot" />
+                  <span className="node-name">WELCOME50</span>
                 </div>
 
                 <svg className="schematic-svg" viewBox="0 0 400 240">
-                  <line x1="80" y1="60" x2="200" y2="120" stroke="#38bdf8" strokeWidth="2" strokeDasharray="3 3" />
-                  <line x1="320" y1="60" x2="200" y2="120" stroke="#38bdf8" strokeWidth="2" strokeDasharray="3 3" />
-                  <line x1="200" y1="120" x2="100" y2="190" stroke="#a855f7" strokeWidth="2" />
-                  <line x1="200" y1="120" x2="300" y2="190" stroke="#f59e0b" strokeWidth="2" />
-                  <line x1="100" y1="190" x2="300" y2="190" stroke="#ef4444" strokeWidth="2" />
+                  <line x1="80" y1="60" x2="200" y2="120" stroke="#3b574f" strokeWidth="1.5" strokeDasharray="4 4" />
+                  <line x1="320" y1="60" x2="200" y2="120" stroke="#3b574f" strokeWidth="1.5" strokeDasharray="4 4" />
+                  <line x1="200" y1="120" x2="100" y2="190" stroke="#3b574f" strokeWidth="1.5" />
+                  <line x1="200" y1="120" x2="300" y2="190" stroke="#3b574f" strokeWidth="1.5" />
+                  <line x1="100" y1="190" x2="300" y2="190" stroke="#854d48" strokeWidth="1.5" />
                 </svg>
 
                 <div className="schematic-footer-label">
-                  <span className="risk-indicator">High Risk Ring Cluster: 96/100</span>
+                  <span className="risk-indicator">Shared Device & Card Cluster (Risk: 94/100)</span>
                 </div>
               </div>
             </div>

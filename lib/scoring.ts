@@ -38,13 +38,7 @@ export function scoreRings(input = accounts): RingCase[] {
 
 export function getDashboardSnapshot(): DashboardSnapshot {
   const rings = scoreRings();
-  const existingIds = new Set(rings.map((r) => r.id));
-  const extraCandidates: RingCase[] = [
-    { ...rings[0], id: "RNG-307", accountIds: ["A-701", "A-702", "A-703", "A-704"], couponCode: "WELCOME30", exposureInr: 1200, score: 78, confidence: 78, status: "queued", evidence: rings[0]?.evidence?.slice(0, 2) || [] },
-    { ...rings[0], id: "RNG-411", accountIds: ["A-803", "A-804", "A-805"], couponCode: "NEW500", exposureInr: 1500, score: 66, confidence: 66, status: "monitoring", evidence: rings[0]?.evidence?.slice(0, 1) || [] },
-  ];
-  const extra = extraCandidates.filter((c) => !existingIds.has(c.id));
-  return { generatedAt: new Date().toISOString(), cases: [...rings, ...extra], metrics: { precision: 94.7, recall: 89.3, f1: 91.9, falsePositiveReviewRate: 5.3, heldOutRings: 20 } };
+  return { generatedAt: new Date().toISOString(), cases: rings, metrics: { precision: 94.7, recall: 89.3, f1: 91.9, falsePositiveReviewRate: 5.3, heldOutRings: 20 } };
 }
 
 export function getCaseById(id: string) { return getDashboardSnapshot().cases.find((ring) => ring.id === id); }

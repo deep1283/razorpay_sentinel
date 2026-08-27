@@ -253,7 +253,7 @@ export function LoginForm() {
           <Button
             type="button"
             variant="ghost"
-            className="w-full bg-white/70 hover:bg-white text-zinc-900 font-semibold h-11 rounded-xl text-sm border border-zinc-200/80 shadow-sm transition-all flex items-center justify-center gap-2"
+            className="w-full bg-white/70 hover:bg-white text-zinc-900 font-semibold h-11 rounded-xl text-sm border border-zinc-200/80 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
           >
@@ -276,6 +276,30 @@ export function LoginForm() {
               />
             </svg>
             {googleLoading ? "Connecting…" : "Continue with Google"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full bg-zinc-900/5 hover:bg-zinc-900/10 text-zinc-800 font-semibold h-11 rounded-xl text-sm border border-zinc-300/60 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+            onClick={() => {
+              router.replace("/dashboard");
+            }}
+          >
+            <svg
+              className="w-4 h-4 text-zinc-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            Sign in as Guest
           </Button>
         </GlassCardFooter>
       </GlassCard>

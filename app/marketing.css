@@ -1959,7 +1959,7 @@
 }
 
 .primer-product-card {
-  min-height: 380px;
+  min-height: 450px;
   padding: 32px;
   border-radius: 16px;
   position: relative;
@@ -1981,6 +1981,8 @@
 }
 
 .primer-product-card h3 {
+  position: relative;
+  z-index: 2;
   max-width: 320px;
   margin: 0;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1992,6 +1994,8 @@
 }
 
 .primer-product-card p {
+  position: relative;
+  z-index: 2;
   max-width: 330px;
   margin: 10px 0 20px;
   font-family: 'Inter', sans-serif;
@@ -2002,6 +2006,8 @@
 
 .primer-product-card a,
 .primer-story a {
+  position: relative;
+  z-index: 2;
   color: #12211c;
   text-decoration: none;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -2026,8 +2032,8 @@
 
 .primer-card-ui {
   position: absolute;
-  top: 36px;
-  left: 36px;
+  top: 32px;
+  left: 32px;
   width: 210px;
   padding: 16px;
   background: #ffffff;
@@ -2035,6 +2041,7 @@
   border-radius: 10px;
   box-shadow: 0 10px 28px rgba(217, 88, 66, 0.12);
   transform: rotate(-4deg);
+  z-index: 1;
 }
 
 .primer-card-ui span {
@@ -2065,10 +2072,14 @@
 
 .primer-network {
   position: absolute;
-  inset: 28px 10%;
+  top: 32px;
+  left: 32px;
+  right: 32px;
+  height: 180px;
   border-radius: 12px;
   background: #f6ecbe;
   border: 1px solid #eddca0;
+  z-index: 1;
 }
 
 .primer-network span {
@@ -2084,9 +2095,9 @@
   box-shadow: 0 6px 16px rgba(163, 139, 53, 0.12);
 }
 
-.primer-network span:nth-child(1) { left: 14%; top: 21%; }
-.primer-network span:nth-child(2) { left: 49%; top: 33%; background: #fdf0ed; border-color: #f5c4b8; color: #9c3325; }
-.primer-network span:nth-child(3) { right: 12%; bottom: 21%; }
+.primer-network span:nth-child(1) { left: 12%; top: 18%; }
+.primer-network span:nth-child(2) { left: 48%; top: 32%; background: #fdf0ed; border-color: #f5c4b8; color: #9c3325; }
+.primer-network span:nth-child(3) { right: 10%; bottom: 18%; }
 
 .primer-network i {
   position: absolute;
@@ -2095,9 +2106,9 @@
   background: #a48938;
   transform-origin: 0 0;
 }
-.primer-network i:nth-of-type(1) { left: 27%; top: 31%; transform: rotate(19deg); }
-.primer-network i:nth-of-type(2) { left: 58%; top: 43%; transform: rotate(38deg); }
-.primer-network i:nth-of-type(3) { left: 25%; top: 31%; width: 170px; transform: rotate(42deg); }
+.primer-network i:nth-of-type(1) { left: 24%; top: 28%; width: 110px; transform: rotate(18deg); }
+.primer-network i:nth-of-type(2) { left: 56%; top: 44%; width: 100px; transform: rotate(32deg); }
+.primer-network i:nth-of-type(3) { left: 22%; top: 28%; width: 180px; transform: rotate(32deg); }
 
 .primer-rail {
   display: grid;

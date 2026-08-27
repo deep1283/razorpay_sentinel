@@ -49,17 +49,12 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
     <main className="brief-dashboard">
       <header className="brief-topbar">
         <Link href="/" className="brief-brand"><span>◈</span> Sentinel</Link>
-        <div className="brief-topbar-actions">
-          <span className="brief-demo-note">Demo workspace</span>
-          <button type="button" onClick={refreshDashboard} disabled={refreshing}>{refreshing ? "Updating…" : "Refresh"}</button>
-        </div>
       </header>
 
       <div className="brief-shell">
         <section className="brief-summary" aria-label="Promotion risk summary">
           <article className="brief-summary-main"><span>Potential promotion loss</span><strong>₹{totalExposure.toLocaleString("en-IN")}</strong><p>across {sortedCases.length} groups that need a quick look</p></article>
           <article><span>Customers to review</span><strong>{accountsToReview}</strong><p>accounts connected by similar details</p></article>
-          <article><span>What Sentinel does</span><p className="brief-reassurance">It flags unusual patterns. Your team stays in control of every decision.</p></article>
         </section>
 
         {mainCase && <section className="brief-priority">

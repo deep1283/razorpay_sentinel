@@ -38,26 +38,6 @@ export function CaseDetailView({ ring }: CaseDetailViewProps) {
           <Link href="/dashboard" className="case-back-link">
             ← Back to Overview
           </Link>
-          <div className="case-top-meta">
-            <span className="case-status-chip">INVESTIGATION QUEUE</span>
-            <span className="case-id-tag">{ring.id}</span>
-          </div>
-        </div>
-      </header>
-
-      <div className="case-main-body">
-        {/* Title & Stats Banner */}
-        <div className="case-header-card">
-          <div className="case-header-left">
-            <span className="case-kicker">COORDINATED PROMOTION ABUSE RING</span>
-            <h1 className="case-main-title">
-              Ring #{ring.id}: {ring.accountIds.length} Clustered Accounts
-            </h1>
-            <p className="case-main-desc">
-              Multiple customer profiles sharing the same hardware fingerprint, payment token, and delivery coordinates to repeatedly claim <b>{ring.couponCode}</b>.
-            </p>
-          </div>
-
           <div className="case-header-stats">
             <div className="stat-pill">
               <span>ACCOUNTS</span>
@@ -73,6 +53,9 @@ export function CaseDetailView({ ring }: CaseDetailViewProps) {
             </div>
           </div>
         </div>
+      </header>
+
+      <div className="case-main-body">
 
         {/* View Switcher Tabs */}
         <div className="case-nav-tabs">

@@ -279,7 +279,12 @@ export function LoginForm() {
           </Button>
 
           <Link
-            href="/dashboard"
+            href="/dashboard?guest=1"
+            onClick={() => {
+              try {
+                localStorage.setItem("sentinel_guest", "1");
+              } catch {}
+            }}
             className="w-full bg-zinc-900/5 hover:bg-zinc-900/10 text-zinc-800 font-semibold h-11 rounded-xl text-sm border border-zinc-300/60 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer no-underline"
           >
             <svg

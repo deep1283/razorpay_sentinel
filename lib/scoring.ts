@@ -20,6 +20,7 @@ function timeWindowMinutes(input: Account[]) {
 export function scoreRings(input = accounts): RingCase[] {
   const links = signalRules.map((rule) => ({ ...rule, groups: grouped(input, rule.key) }));
   const candidates = Object.values(links[0].groups).filter((group) => group.length >= 3);
+  const presetIds = ["RNG-024", "RNG-118", "RNG-209", "RNG-512", "RNG-680"];
   return candidates.map((members, index) => {
     const accountIds = members.map((member) => member.id);
     const shared = links.filter((link) => Object.values(link.groups).some((group) => group.length === members.length && group.every((member) => accountIds.includes(member.id))));
@@ -30,14 +31,19 @@ export function scoreRings(input = accounts): RingCase[] {
     if (window <= 30 && couponEntries.length === members.length) evidence.push({ kind: "timing", label: "Synchronized coupon redemption", detail: `${window} minutes · ${couponCode}`, strength: "medium", contribution: 19, accountIds });
     const score = Math.min(99, evidence.reduce((total, item) => total + item.contribution, 0));
     const exposureInr = couponEntries.reduce((total, item) => total + item.discountInr, 0);
-    const id = index === 0 ? "RNG-024" : "RNG-118";
+    const id = presetIds[index] ?? `RNG-${String(index + 100).padStart(3, "0")}`;
     return { id, accountIds, couponCode, exposureInr, score, confidence: score, status: "investigate", evidence, createdAt: new Date().toISOString(), explanation: `${members.length} new accounts share ${evidence.filter((item) => item.strength === "strong").length} high-strength identity signals and redeemed ${couponCode} within a ${window}-minute window. This is a potential coordinated promotion-abuse ring requiring manual investigation.`, limitations: ["Shared households, offices, and devices can create legitimate links.", "This score is an investigation priority, not a determination of wrongdoing."] };
   });
 }
 
 export function getDashboardSnapshot(): DashboardSnapshot {
   const rings = scoreRings();
-  const extra: RingCase[] = [{ ...rings[0], id: "RNG-307", accountIds: ["A-701", "A-702", "A-703", "A-704"], couponCode: "WELCOME30", exposureInr: 1200, score: 78, confidence: 78, status: "queued", evidence: rings[0].evidence.slice(0, 2) }, { ...rings[0], id: "RNG-411", accountIds: ["A-803", "A-804", "A-805"], couponCode: "NEW500", exposureInr: 1500, score: 66, confidence: 66, status: "monitoring", evidence: rings[0].evidence.slice(0, 1) }];
+  const existingIds = new Set(rings.map((r) => r.id));
+  const extraCandidates: RingCase[] = [
+    { ...rings[0], id: "RNG-307", accountIds: ["A-701", "A-702", "A-703", "A-704"], couponCode: "WELCOME30", exposureInr: 1200, score: 78, confidence: 78, status: "queued", evidence: rings[0]?.evidence?.slice(0, 2) || [] },
+    { ...rings[0], id: "RNG-411", accountIds: ["A-803", "A-804", "A-805"], couponCode: "NEW500", exposureInr: 1500, score: 66, confidence: 66, status: "monitoring", evidence: rings[0]?.evidence?.slice(0, 1) || [] },
+  ];
+  const extra = extraCandidates.filter((c) => !existingIds.has(c.id));
   return { generatedAt: new Date().toISOString(), cases: [...rings, ...extra], metrics: { precision: 94.7, recall: 89.3, f1: 91.9, falsePositiveReviewRate: 5.3, heldOutRings: 20 } };
 }
 

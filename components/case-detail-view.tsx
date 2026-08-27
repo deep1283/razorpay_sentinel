@@ -40,15 +40,11 @@ export function CaseDetailView({ ring }: CaseDetailViewProps) {
           </Link>
           <div className="case-header-stats">
             <div className="stat-pill">
-              <span>ACCOUNTS</span>
-              <b>{ring.accountIds.length}</b>
-            </div>
-            <div className="stat-pill">
               <span>VALUE AT RISK</span>
               <b>₹{ring.exposureInr.toLocaleString("en-IN")}</b>
             </div>
             <div className="stat-pill risk">
-              <span>RISK SCORE</span>
+              <span>CONFIDENCE SCORE</span>
               <b>{ring.confidence}/100</b>
             </div>
           </div>

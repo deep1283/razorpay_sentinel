@@ -5,256 +5,84 @@ import { useEffect, useState } from "react";
 import type { DashboardSnapshot, RingCase } from "@/lib/domain";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
+function priorityFor(ring: RingCase) {
+  if (ring.score >= 80) return { label: "Review today", tone: "urgent" };
+  if (ring.score >= 70) return { label: "Review soon", tone: "soon" };
+  return { label: "Keep an eye on it", tone: "watch" };
+}
+
+function plainReason(ring: RingCase) {
+  const signals = ring.evidence.slice(0, 2).map((item) => item.label.toLowerCase());
+  if (signals.length === 0) return "We noticed an unusual pattern in these orders.";
+  return `These accounts share ${signals.join(" and ")}.`;
+}
+
 export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
-  const [data, setData] = useState<DashboardSnapshot>(initial);
-  const [filter, setFilter] = useState<"all" | "high" | "monitoring">("all");
+  const [data, setData] = useState(initial);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const client = createBrowserSupabaseClient();
-    const isGuest =
-      typeof window !== "undefined" &&
-      (new URLSearchParams(window.location.search).get("guest") === "1" ||
-        localStorage.getItem("sentinel_guest") === "1");
-
+    const isGuest = new URLSearchParams(window.location.search).get("guest") === "1";
     if (!client) return;
     client.auth.getSession().then(({ data: { session } }) => {
-      if (!session && !isGuest) {
-        window.location.assign("/login");
-      }
+      if (!session && !isGuest) window.location.assign("/login");
     });
   }, []);
 
-  async function handleRefresh() {
+  async function refreshDashboard() {
     setRefreshing(true);
     try {
-      const res = await fetch("/api/dashboard");
-      if (res.ok) {
-        const json = await res.json();
-        setData(json);
-      }
-    } catch {}
-    setRefreshing(false);
+      const response = await fetch("/api/dashboard");
+      if (response.ok) setData(await response.json());
+    } finally {
+      setRefreshing(false);
+    }
   }
 
-  const primary: RingCase | undefined = data.cases[0];
-
-  const filteredCases = data.cases.filter((item) => {
-    if (filter === "high") return item.score >= 80;
-    if (filter === "monitoring") return item.status === "monitoring" || item.score < 80;
-    return true;
-  });
-
-  const totalExposure = data.cases.reduce((sum, ring) => sum + ring.exposureInr, 0);
-  const uniqueAccountsCount = new Set(data.cases.flatMap((c) => c.accountIds)).size;
-  const maxScore = Math.max(...data.cases.map((c) => c.score), 0);
+  const sortedCases = [...data.cases].sort((a, b) => b.score - a.score);
+  const mainCase = sortedCases[0];
+  const totalExposure = sortedCases.reduce((sum, ring) => sum + ring.exposureInr, 0);
+  const accountsToReview = new Set(sortedCases.flatMap((ring) => ring.accountIds)).size;
 
   return (
-    <main className="dash-root">
-      {/* Modern Top Navigation */}
-      <header className="dash-topbar">
-        <div className="dash-topbar-inner">
-          <div className="dash-topbar-left">
-            <Link href="/" className="dash-logo">
-              <span className="dash-logo-icon">◈</span>
-              <span className="dash-logo-text">Sentinel</span>
-            </Link>
-            <div className="dash-live-badge">
-              <span className="live-dot" />
-              <span>Passive Ingestion Active</span>
-            </div>
-          </div>
-
-          <div className="dash-topbar-right">
-            <button
-              type="button"
-              onClick={handleRefresh}
-              className="dash-btn-ghost"
-              disabled={refreshing}
-            >
-              {refreshing ? "Refreshing…" : "↻ Refresh Signals"}
-            </button>
-            <Link href="/" className="dash-btn-outline">
-              Exit to Home →
-            </Link>
-          </div>
+    <main className="brief-dashboard">
+      <header className="brief-topbar">
+        <Link href="/" className="brief-brand"><span>◈</span> Sentinel</Link>
+        <div className="brief-topbar-actions">
+          <span className="brief-demo-note">Demo workspace</span>
+          <button type="button" onClick={refreshDashboard} disabled={refreshing}>{refreshing ? "Updating…" : "Refresh"}</button>
         </div>
       </header>
 
-      {/* Main Dashboard Container */}
-      <div className="dash-container">
-        {/* Intro Header */}
-        <div className="dash-heading-row">
-          <div>
-            <span className="dash-kicker">INVESTIGATION WORKSPACE</span>
-            <h1 className="dash-title">Fraud & Abuse Signals</h1>
-            <p className="dash-subtitle">
-              Live multi-account identity clustering and promotional abuse detection.
-            </p>
+      <div className="brief-shell">
+        <section className="brief-summary" aria-label="Promotion risk summary">
+          <article className="brief-summary-main"><span>Potential promotion loss</span><strong>₹{totalExposure.toLocaleString("en-IN")}</strong><p>across {sortedCases.length} groups that need a quick look</p></article>
+          <article><span>Customers to review</span><strong>{accountsToReview}</strong><p>accounts connected by similar details</p></article>
+          <article><span>What Sentinel does</span><p className="brief-reassurance">It flags unusual patterns. Your team stays in control of every decision.</p></article>
+        </section>
+
+        {mainCase && <section className="brief-priority">
+          <div className="brief-priority-copy"><span className="brief-priority-label">START HERE</span><h2>{mainCase.accountIds.length} customers may be using the same offer together.</h2><p>{plainReason(mainCase)} They used <b>{mainCase.couponCode}</b>, putting ₹{mainCase.exposureInr.toLocaleString("en-IN")} of promotion value at risk.</p><Link href={`/cases/${mainCase.id}`}>Review this group <b>→</b></Link></div>
+          <div className="brief-priority-facts"><span>CASE {mainCase.id}</span><div><b>{mainCase.accountIds.length}</b><small>customers linked</small></div><div><b>₹{mainCase.exposureInr.toLocaleString("en-IN")}</b><small>offer value used</small></div></div>
+        </section>}
+
+        <section className="brief-list-section">
+          <div className="brief-list-heading"><div><p>OTHER GROUPS TO CHECK</p><h2>Keep an eye on these</h2></div><span>{sortedCases.length} groups found</span></div>
+          <div className="brief-case-list">
+            {sortedCases.map((ring) => {
+              const priority = priorityFor(ring);
+              return <article className="brief-case" key={ring.id}>
+                <div className={`brief-case-dot ${priority.tone}`} aria-hidden="true" />
+                <div className="brief-case-description"><div><b>{ring.accountIds.length} linked customers</b><span className={`brief-priority-pill ${priority.tone}`}>{priority.label}</span></div><p>{plainReason(ring)}</p></div>
+                <div className="brief-case-offer"><span>Offer used</span><b>{ring.couponCode}</b></div>
+                <div className="brief-case-value"><span>Value at risk</span><b>₹{ring.exposureInr.toLocaleString("en-IN")}</b></div>
+                <Link href={`/cases/${ring.id}`} aria-label={`Review case ${ring.id}`}>Review <b>→</b></Link>
+              </article>;
+            })}
           </div>
-        </div>
-
-        {/* 4 Essential KPI Cards */}
-        <div className="dash-metrics-grid">
-          <div className="dash-metric-card">
-            <span className="metric-label">Active Clusters</span>
-            <b className="metric-val">{data.cases.length}</b>
-            <span className="metric-meta">Awaiting review</span>
-          </div>
-
-          <div className="dash-metric-card">
-            <span className="metric-label">Protected Exposure</span>
-            <b className="metric-val">₹{totalExposure.toLocaleString("en-IN")}</b>
-            <span className="metric-meta">Across detected rings</span>
-          </div>
-
-          <div className="dash-metric-card">
-            <span className="metric-label">Flagged Accounts</span>
-            <b className="metric-val">{uniqueAccountsCount}</b>
-            <span className="metric-meta">Clustered entities</span>
-          </div>
-
-          <div className="dash-metric-card">
-            <span className="metric-label">Peak Ring Risk</span>
-            <b className="metric-val text-red-600">{maxScore}/100</b>
-            <span className="metric-meta">Immediate priority</span>
-          </div>
-        </div>
-
-        {/* Priority Case Spotlight */}
-        {primary && (
-          <div className="dash-spotlight-card">
-            <div className="spotlight-main">
-              <div className="spotlight-header">
-                <span className="case-id-badge">{primary.id}</span>
-                <span className="priority-tag">TOP INVESTIGATION PRIORITY</span>
-              </div>
-
-              <h2 className="spotlight-title">
-                {primary.accountIds.length} Connected Accounts · Promo Code {primary.couponCode}
-              </h2>
-
-              <p className="spotlight-desc">{primary.explanation}</p>
-
-              {/* Signals Breakdown */}
-              <div className="spotlight-signals">
-                {primary.evidence.map((item, idx) => (
-                  <div key={`${item.kind}-${idx}`} className="signal-item">
-                    <span className={`strength-indicator ${item.strength}`} />
-                    <div className="signal-text">
-                      <b>{item.label}</b>
-                      <small>{item.detail}</small>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="spotlight-actions">
-                <Link href={`/cases/${primary.id}`} className="dash-primary-btn">
-                  Inspect Evidence Graph →
-                </Link>
-              </div>
-            </div>
-
-            <div className="spotlight-sidebar">
-              <span className="sidebar-label">CONFIDENCE SCORE</span>
-              <div className="sidebar-score">{primary.confidence}</div>
-              <span className="sidebar-scale">out of 100</span>
-
-              <hr className="sidebar-divider" />
-
-              <div className="sidebar-meta">
-                <span>VOUCHER EXPOSURE</span>
-                <b>₹{primary.exposureInr.toLocaleString("en-IN")}</b>
-              </div>
-
-              <div className="sidebar-meta mt-2">
-                <span>STATUS</span>
-                <b className="status-tag">Needs Analyst Decision</b>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Investigation Cases Queue */}
-        <div className="dash-queue-section">
-          <div className="queue-header">
-            <div>
-              <h3 className="queue-title">Investigation Queue</h3>
-              <p className="queue-subtitle">All detected promo abuse and identity rings.</p>
-            </div>
-
-            <div className="queue-filter-tabs">
-              <button
-                type="button"
-                className={`filter-btn ${filter === "all" ? "active" : ""}`}
-                onClick={() => setFilter("all")}
-              >
-                All ({data.cases.length})
-              </button>
-              <button
-                type="button"
-                className={`filter-btn ${filter === "high" ? "active" : ""}`}
-                onClick={() => setFilter("high")}
-              >
-                High Risk (≥80)
-              </button>
-              <button
-                type="button"
-                className={`filter-btn ${filter === "monitoring" ? "active" : ""}`}
-                onClick={() => setFilter("monitoring")}
-              >
-                Monitoring
-              </button>
-            </div>
-          </div>
-
-          <div className="queue-table-wrap">
-            <table className="queue-table">
-              <thead>
-                <tr>
-                  <th>Case ID</th>
-                  <th>Linked Accounts</th>
-                  <th>Voucher Code</th>
-                  <th>Exposure</th>
-                  <th>Risk Score</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCases.map((ring, idx) => (
-                  <tr key={`${ring.id}-${idx}`}>
-                    <td>
-                      <span className="table-case-id">{ring.id}</span>
-                    </td>
-                    <td>
-                      <div className="table-accounts">
-                        <b>{ring.accountIds.length} Accounts</b>
-                        <small>{ring.accountIds.slice(0, 3).join(", ")}{ring.accountIds.length > 3 ? "…" : ""}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <code className="table-promo-code">{ring.couponCode}</code>
-                    </td>
-                    <td>
-                      <span className="table-exposure">₹{ring.exposureInr.toLocaleString("en-IN")}</span>
-                    </td>
-                    <td>
-                      <span className={`risk-badge ${ring.score >= 80 ? "high" : "med"}`}>
-                        {ring.score}/100
-                      </span>
-                    </td>
-                    <td>
-                      <Link href={`/cases/${ring.id}`} className="table-inspect-link">
-                        Inspect Case →
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        </section>
+        <p className="brief-footer-note">Sentinel never blocks a customer or changes an order automatically.</p>
       </div>
     </main>
   );

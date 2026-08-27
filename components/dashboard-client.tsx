@@ -41,7 +41,6 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
   }
 
   const sortedCases = [...data.cases].sort((a, b) => b.score - a.score);
-  const mainCase = sortedCases[0];
   const totalExposure = sortedCases.reduce((sum, ring) => sum + ring.exposureInr, 0);
   const accountsToReview = new Set(sortedCases.flatMap((ring) => ring.accountIds)).size;
 
@@ -57,13 +56,8 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
           <article><span>Customers to review</span><strong>{accountsToReview}</strong><p>accounts connected by similar details</p></article>
         </section>
 
-        {mainCase && <section className="brief-priority">
-          <div className="brief-priority-copy"><span className="brief-priority-label">START HERE</span><h2>{mainCase.accountIds.length} customers may be using the same offer together.</h2><p>{plainReason(mainCase)} They used <b>{mainCase.couponCode}</b>, putting ₹{mainCase.exposureInr.toLocaleString("en-IN")} of promotion value at risk.</p><Link href={`/cases/${mainCase.id}`}>Review this group <b>→</b></Link></div>
-          <div className="brief-priority-facts"><span>CASE {mainCase.id}</span><div><b>{mainCase.accountIds.length}</b><small>customers linked</small></div><div><b>₹{mainCase.exposureInr.toLocaleString("en-IN")}</b><small>offer value used</small></div></div>
-        </section>}
-
         <section className="brief-list-section">
-          <div className="brief-list-heading"><div><p>OTHER GROUPS TO CHECK</p><h2>Keep an eye on these</h2></div><span>{sortedCases.length} groups found</span></div>
+          <div className="brief-list-heading"><div><p>ACTIVE CASES</p><h2>Groups to review</h2></div><span>{sortedCases.length} groups found</span></div>
           <div className="brief-case-list">
             {sortedCases.map((ring) => {
               const priority = priorityFor(ring);

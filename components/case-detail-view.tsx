@@ -45,7 +45,7 @@ export function CaseDetailView({ ring }: CaseDetailViewProps) {
             </div>
             <div className="stat-pill risk">
               <span>CONFIDENCE SCORE</span>
-              <b>{ring.confidence}/100</b>
+              <b>{ring.confidence}%</b>
             </div>
           </div>
         </div>

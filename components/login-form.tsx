@@ -278,13 +278,9 @@ export function LoginForm() {
             {googleLoading ? "Connecting…" : "Continue with Google"}
           </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full bg-zinc-900/5 hover:bg-zinc-900/10 text-zinc-800 font-semibold h-11 rounded-xl text-sm border border-zinc-300/60 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-            onClick={() => {
-              router.replace("/dashboard");
-            }}
+          <Link
+            href="/dashboard"
+            className="w-full bg-zinc-900/5 hover:bg-zinc-900/10 text-zinc-800 font-semibold h-11 rounded-xl text-sm border border-zinc-300/60 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer no-underline"
           >
             <svg
               className="w-4 h-4 text-zinc-600"
@@ -300,7 +296,7 @@ export function LoginForm() {
               />
             </svg>
             Sign in as Guest
-          </Button>
+          </Link>
         </GlassCardFooter>
       </GlassCard>
     </div>

@@ -42,14 +42,13 @@ export function CaseDetailView({ ring }: { ring: RingCase }) {
   const exposureByAccount = useMemo(() => new Map((ring.redemptions ?? redemptions).filter((item) => ring.accountIds.includes(item.accountId)).map((item) => [item.accountId, item])), [ring.accountIds, ring.redemptions]);
 
   return <main className="case-page">
-    <header className="case-header"><Link href="/dashboard?guest=1">← Back to dashboard</Link><div><span>Customer experience</span><b>{ring.recommendedAction}</b></div></header>
+    <header className="case-header"><Link href="/dashboard?guest=1">← Back to dashboard</Link><div><span>Risk score</span><b>{ring.score}%</b></div></header>
     <div className="case-shell">
       <nav className="case-tabs" aria-label="Case views">
         {(["graph", "accounts", "evidence"] as Tab[]).map((tab) => <button key={tab} type="button" className={activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)}>{tab === "graph" ? "Overview" : tab === "accounts" ? `Customers (${members.length})` : "What we noticed"}</button>)}
       </nav>
 
       {activeTab === "graph" && <section className="case-graph-card">
-        <div className="case-risk-summary"><span>Risk score {ring.score}/100 · {ring.riskLevel} risk</span><h1>{ring.recommendedAction}</h1><p>{ring.actionDetail}</p></div>
         <ul className="case-proof-list">{signals.map((signal, index) => <li key={`${signal.kind}-${index}`}>{plainSignal(signal, ring.couponCode)}</li>)}</ul>
         <div className="circle-graph" role="img" aria-label={`Circular evidence map for case ${ring.id}, with ${members.length} accounts and ${signals.length} shared signals`}>
           <svg viewBox="0 0 700 700" aria-hidden="true">

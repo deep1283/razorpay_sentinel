@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import type { DashboardSnapshot, RingCase } from "@/lib/domain";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
-function actionFor(ring: RingCase) {
-  if (ring.riskLevel === "high") return { label: ring.recommendedAction, tone: "urgent" };
-  if (ring.riskLevel === "medium") return { label: ring.recommendedAction, tone: "soon" };
-  return { label: ring.recommendedAction, tone: "watch" };
+function toneFor(ring: RingCase) {
+  if (ring.riskLevel === "high") return "urgent";
+  if (ring.riskLevel === "medium") return "soon";
+  return "watch";
 }
 
 function plainReason(ring: RingCase) {
@@ -61,10 +61,10 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
           {sortedCases.length === 0 ? <Link href="/connect" className="brief-start-tracking">Connect to Razorpay to start tracking <b>→</b></Link> : <><div className="brief-list-heading"><div><p>RISK CHECKS</p><h2>Signup patterns to review</h2></div><span>{sortedCases.length} groups found</span></div>
           <div className="brief-case-list">
             {sortedCases.map((ring) => {
-              const action = actionFor(ring);
+              const tone = toneFor(ring);
               return <article className="brief-case" key={ring.id}>
-                <div className={`brief-case-dot ${action.tone}`} aria-hidden="true" />
-                <div className="brief-case-description"><div><b>{ring.accountIds.length} customers</b><span className={`brief-priority-pill ${action.tone}`}>{action.label}</span></div><p>{plainReason(ring)}</p></div>
+                <div className={`brief-case-dot ${tone}`} aria-hidden="true" />
+                <div className="brief-case-description"><div><b>{ring.accountIds.length} customers</b></div><p>{plainReason(ring)}</p></div>
                 <div className="brief-case-offer"><span>Offer used</span><b>{ring.couponCode}</b></div>
                 <div className="brief-case-value"><span>Risk score</span><b>{ring.score}%</b></div>
                 <Link href={`/cases/${ring.id}`} aria-label={`View signup pattern ${ring.id}`}>View <b>→</b></Link>

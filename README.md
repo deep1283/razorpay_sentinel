@@ -4,7 +4,7 @@ An explainable, read-only investigation tool for coordinated new-customer promot
 
 ## What it does
 
-- Ingests Razorpay `order.paid` / `payment.captured`-shaped events through a signature-validated webhook endpoint.
+- Persists real Razorpay Test Mode `order.paid` / `payment.captured` events through a signature-validated webhook endpoint.
 - Combines payment events with merchant checkout signals: account age, device/IP hashes, delivery-address hashes, coupon use, and timestamps.
 - Detects connected groups of accounts with multiple independent links.
 - Shows an evidence graph, estimated promotion exposure, risk score, and a human-review explanation.
@@ -36,7 +36,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The app is fully usable with deterministic seeded data and needs no keys for its demo mode.
+Open [http://localhost:3000](http://localhost:3000). The app uses deterministic seeded data only until Supabase is configured; once configured, the dashboard shows matched Razorpay Test Mode data and does not blend it with demo cases.
 
 For a live explanation, set `OPENAI_API_KEY` in `.env.local`. The API route uses the server-side OpenAI Responses API with strict JSON Schema and `store: false`; it receives only computed evidence, never raw payment details.
 
@@ -51,7 +51,7 @@ For a live explanation, set `OPENAI_API_KEY` in `.env.local`. The API route uses
 
 ## Supabase and Python service
 
-Apply [the migration](supabase/migrations/20260826150000_initial_schema.sql) to a Supabase project. It creates raw-event, risk-case, evidence, and review-label tables with RLS enabled.
+Apply both migrations in `supabase/migrations/` to a Supabase project. They create raw-event, checkout-signal, risk-case, evidence, and review-label tables with RLS enabled.
 
 To run the independent Python scorer:
 
@@ -69,7 +69,30 @@ The demo data includes planted coordinated rings, legitimate shared-household ha
 
 ## Razorpay webhook setup
 
-Use Test Mode. Configure `https://your-domain/api/webhooks/razorpay` and subscribe to `order.paid` and/or `payment.captured`. Store the webhook secret only in `RAZORPAY_WEBHOOK_SECRET`. The handler validates `x-razorpay-signature`, returns a fast acknowledgement, and does not invoke any money-action API.
+Use Test Mode. Configure `https://your-domain/api/webhooks/razorpay` and subscribe to `order.paid` and/or `payment.captured`. Store the webhook secret only in `RAZORPAY_WEBHOOK_SECRET`. The handler validates `x-razorpay-signature`, stores each event once by its event ID, returns a fast acknowledgement, and does not invoke any money-action API.
+
+### Live data flow
+
+Razorpay webhooks confirm payment activity, but they do not include the checkout signals needed to detect a shared-device, shared-network, or shared-address pattern. Your merchant server must send its **hashed** checkout signals after it creates an order:
+
+```bash
+curl -X POST https://your-domain/api/signals/checkout \
+  -H "Authorization: Bearer $SENTINEL_INGEST_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "merchantOrderId":"order_test_123",
+    "accountId":"customer_456",
+    "createdAt":"2026-08-29T10:00:00Z",
+    "deviceHash":"sha256:...",
+    "paymentTokenHash":"token:...",
+    "addressHash":"sha256:...",
+    "ipHash":"sha256:...",
+    "couponCode":"NEW500",
+    "discountInr":500
+  }'
+```
+
+Sentinel scores a record only after its `merchantOrderId` appears in a verified `order.paid` or `payment.captured` webhook. Store hashes or token references only—never card numbers, CVVs, or raw payment credentials. For local testing, expose the app using an HTTPS tunnel because Razorpay webhook URLs must be publicly reachable.
 
 ## Project layout
 

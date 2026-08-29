@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 function validSignature(raw: string, signature: string | null) {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -11,9 +12,20 @@ function validSignature(raw: string, signature: string | null) {
 export async function POST(request: Request) {
   const raw = await request.text();
   if (!validSignature(raw, request.headers.get("x-razorpay-signature"))) return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
-  const eventId = request.headers.get("x-razorpay-event-id");
-  const event = JSON.parse(raw) as { event?: string };
-  // Persist raw event + eventId to Supabase here in production; acknowledge within 5 seconds,
-  // then analyze asynchronously. This endpoint intentionally has no money-action code path.
-  return NextResponse.json({ received: true, eventId, event: event.event, action: "observation_only" }, { status: 202 });
+  let event: { event?: unknown; payload?: { payment?: { entity?: { id?: unknown } } } };
+  try { event = JSON.parse(raw) as typeof event; }
+  catch { return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 }); }
+
+  const eventType = typeof event.event === "string" ? event.event : "unknown";
+  const paymentId = event.payload?.payment?.entity?.id;
+  const eventId = request.headers.get("x-razorpay-event-id") ?? (typeof paymentId === "string" ? `${eventType}:${paymentId}` : null);
+  if (!eventId) return NextResponse.json({ error: "Missing Razorpay event identifier" }, { status: 400 });
+
+  const client = createServerSupabaseClient();
+  if (!client) return NextResponse.json({ error: "Webhook storage is not configured" }, { status: 503 });
+  const { error } = await client.from("raw_events").insert({ source: "razorpay", external_event_id: eventId, event_type: eventType, payload: event });
+  if (error?.code === "23505") return NextResponse.json({ received: true, duplicate: true, eventId, event: eventType, action: "observation_only" }, { status: 200 });
+  if (error) return NextResponse.json({ error: "Unable to store webhook event" }, { status: 503 });
+
+  return NextResponse.json({ received: true, eventId, event: eventType, action: "observation_only" }, { status: 202 });
 }

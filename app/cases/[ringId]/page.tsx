@@ -8,7 +8,7 @@ export default async function CaseDetailPage({
   params: Promise<{ ringId: string }>;
 }) {
   const { ringId } = await params;
-  const ring = getCaseById(ringId);
+  const ring = await getCaseById(ringId);
 
   if (!ring) {
     notFound();

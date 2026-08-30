@@ -3,6 +3,7 @@ import { createHmac } from "crypto";
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { hashSignal } from "@/lib/signal-hash";
+import { TEST_PAYMENT_AMOUNT_SUBUNITS } from "@/lib/test-checkout";
 
 type OrderRequest = { accountId?: unknown; couponCode?: unknown; deviceHash?: unknown; email?: unknown; phone?: unknown; deliveryAddress?: unknown; referralCode?: unknown };
 
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
     orderResponse = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
       headers: { "content-type": "application/json", authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}` },
-      body: JSON.stringify({ amount: 100, currency: "INR", receipt: `sentinel_${crypto.randomUUID()}`, notes: { source: "sentinel_test_checkout", coupon_code: couponCode } }),
+      body: JSON.stringify({ amount: TEST_PAYMENT_AMOUNT_SUBUNITS, currency: "INR", receipt: `sentinel_${crypto.randomUUID()}`, notes: { source: "sentinel_test_checkout", coupon_code: couponCode } }),
     });
   } catch {
     return NextResponse.json({ error: "Could not reach Razorpay to create the Test Mode order. Please try again." }, { status: 502 });
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
 
   const client = createServerSupabaseClient();
   if (!client) return NextResponse.json({ error: "Signal storage is not configured" }, { status: 503 });
-  const { error } = await client.from("checkout_signals").insert({ merchant_order_id: order.id, account_id: accountId, created_at: new Date().toISOString(), device_hash: deviceHash, payment_token_hash: null, address_hash: addressHash, ip_hash: ipHash, email_hash: emailHash, phone_hash: phoneHash, referral_code: referralCode, coupon_code: couponCode, discount_inr: 100 });
+  const { error } = await client.from("checkout_signals").insert({ merchant_order_id: order.id, account_id: accountId, created_at: new Date().toISOString(), device_hash: deviceHash, payment_token_hash: null, address_hash: addressHash, ip_hash: ipHash, email_hash: emailHash, phone_hash: phoneHash, referral_code: referralCode, coupon_code: couponCode, discount_inr: Math.round(order.amount / 100) });
   if (error) return NextResponse.json({ error: "Unable to store the checkout signal" }, { status: 503 });
 
   return NextResponse.json({ orderId: order.id, amount: order.amount, currency: order.currency, keyId });

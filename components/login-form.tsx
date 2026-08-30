@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SentinelLogo } from "@/components/ui/sentinel-logo";
 
 export function LoginForm() {
   const router = useRouter();
@@ -125,7 +126,8 @@ export function LoginForm() {
       />
 
       <GlassCard className="w-full max-w-[390px] relative z-10 bg-white/40 border-white/50 backdrop-blur-2xl rounded-3xl shadow-2xl p-2 py-7 text-zinc-900">
-        <GlassCardHeader className="px-6 pb-2 text-center flex flex-col items-center justify-center">
+        <GlassCardHeader className="px-6 pb-2 text-center flex flex-col items-center justify-center gap-2">
+          <SentinelLogo size={42} className="rounded-xl shadow-md" />
           <GlassCardTitle className="text-2xl font-bold tracking-tight text-zinc-900 text-center w-full">
             Welcome
           </GlassCardTitle>

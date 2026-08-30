@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { SentinelLogo } from "@/components/ui/sentinel-logo";
 import type { DashboardSnapshot, RingCase } from "@/lib/domain";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
@@ -47,7 +48,7 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
   return (
     <main className="brief-dashboard">
       <header className="brief-topbar">
-        <Link href="/" className="brief-brand"><span>◈</span> Sentinel</Link>
+        <Link href="/" className="brief-brand flex items-center gap-2"><SentinelLogo size={22} className="rounded-md" /> Sentinel</Link>
       </header>
 
       <div className="brief-shell">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { SentinelLogo } from "@/components/ui/sentinel-logo";
 
 const journeys = [
   {
@@ -175,7 +176,7 @@ export function CommerceShowcase() {
           </div>
         </div>
       </section>
-      <footer className="primer-footer"><div className="primer-footer-brand"><b>◈ Sentinel</b><p>Fraud intelligence for the teams that keep commerce moving.</p></div><div><b>Product</b><a href="#features">Capabilities</a><Link href="/dashboard">Live workspace</Link><Link href="/login">Sign in</Link></div><div><b>Resources</b><a href="#safety">Evidence trails</a><a href="#contact">Talk to us</a><a href="#features">How it works</a></div><div><b>Stay in the loop</b><p>Product notes and safer-growth ideas, occasionally.</p><Link className="primer-footer-button" href="/login">Get access →</Link></div><small>© {new Date().getFullYear()} Sentinel Intelligence · Built for Razorpay merchants</small></footer>
+      <footer className="primer-footer"><div className="primer-footer-brand"><b className="flex items-center gap-2"><SentinelLogo size={20} className="rounded-md" /> Sentinel</b><p>Fraud intelligence for the teams that keep commerce moving.</p></div><div><b>Product</b><a href="#features">Capabilities</a><Link href="/dashboard">Live workspace</Link><Link href="/login">Sign in</Link></div><div><b>Resources</b><a href="#safety">Evidence trails</a><a href="#contact">Talk to us</a><a href="#features">How it works</a></div><div><b>Stay in the loop</b><p>Product notes and safer-growth ideas, occasionally.</p><Link className="primer-footer-button" href="/login">Get access →</Link></div><small>© {new Date().getFullYear()} Sentinel Intelligence · Built for Razorpay merchants</small></footer>
     </>
   );
 }

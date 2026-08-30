@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SentinelLogo } from "@/components/ui/sentinel-logo";
 
 export function SentinelHero() {
   return (
@@ -11,8 +12,8 @@ export function SentinelHero() {
 
       <header className="landing-header hero-header-overlay">
         <nav className="landing-nav" aria-label="Main navigation">
-          <Link href="/" className="landing-brand">
-            <span className="brand-mark">◈</span>
+          <Link href="/" className="landing-brand flex items-center gap-2">
+            <SentinelLogo size={22} className="rounded-md" />
             <span className="brand-name">Sentinel</span>
           </Link>
           <div className="nav-menu">

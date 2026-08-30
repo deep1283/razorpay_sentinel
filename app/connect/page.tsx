@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { SentinelLogo } from "@/components/ui/sentinel-logo";
 
 export default function ConnectRazorpayPage() {
   const [webhookUrl, setWebhookUrl] = useState("https://your-public-domain.com/api/webhooks/razorpay");
@@ -10,7 +11,7 @@ export default function ConnectRazorpayPage() {
   }, []);
 
   return <main className="connect-page">
-    <header className="connect-topbar"><Link href="/dashboard?guest=1" className="brief-brand"><span>◈</span> Sentinel</Link><Link href="/dashboard?guest=1">Back to dashboard</Link></header>
+    <header className="connect-topbar"><Link href="/dashboard?guest=1" className="brief-brand flex items-center gap-2"><SentinelLogo size={20} className="rounded-md" /> Sentinel</Link><Link href="/dashboard?guest=1">Back to dashboard</Link></header>
     <section className="connect-shell">
       <p className="connect-kicker">RAZORPAY TEST MODE</p>
       <h1>Set up your Test Mode workspace</h1>

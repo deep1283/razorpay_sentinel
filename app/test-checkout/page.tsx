@@ -4,8 +4,15 @@ import { FormEvent, useState } from "react";
 
 declare global { interface Window { Razorpay?: new (options: Record<string, unknown>) => { open: () => void }; } }
 
+const browserIdKey = "sentinel_browser_id";
+
 function browserHash() {
-  return crypto.subtle.digest("SHA-256", new TextEncoder().encode([navigator.userAgent, navigator.language, screen.width, screen.height, Intl.DateTimeFormat().resolvedOptions().timeZone].join("|"))).then((digest) => `sha256:${Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("")}`);
+  let browserId = localStorage.getItem(browserIdKey);
+  if (!browserId) {
+    browserId = crypto.randomUUID();
+    localStorage.setItem(browserIdKey, browserId);
+  }
+  return crypto.subtle.digest("SHA-256", new TextEncoder().encode([browserId, navigator.userAgent, navigator.language, screen.width, screen.height, Intl.DateTimeFormat().resolvedOptions().timeZone].join("|"))).then((digest) => `sha256:${Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("")}`);
 }
 
 function loadCheckout() {
@@ -33,5 +40,5 @@ export default function TestCheckoutPage() {
     finally { setLoading(false); }
   }
 
-  return <main className="test-checkout-page"><section className="test-checkout-card"><p>RAZORPAY TEST MODE</p><h1>Make a test payment</h1><span>Use a different customer ID for each signup. Reusing this browser or network gives Sentinel another shared signal to review.</span><form onSubmit={startPayment}><label>Test customer ID<input value={accountId} onChange={(event) => setAccountId(event.target.value)} required /></label><label>Offer code<input value={couponCode} onChange={(event) => setCouponCode(event.target.value)} required /></label><button type="submit" disabled={loading}>{loading ? "Opening checkout…" : "Pay ₹1 in Test Mode"}</button></form>{message && <div role="status">{message}</div>}<small>Sentinel stores hashed browser and network signals only. It never stores card numbers or CVVs.</small></section></main>;
+  return <main className="test-checkout-page"><section className="test-checkout-card"><p>RAZORPAY TEST MODE</p><h1>Make a test payment</h1><span>Use a different customer ID for each signup. Reusing this browser or network gives Sentinel another shared signal to review.</span><form onSubmit={startPayment}><label>Test customer ID<input value={accountId} onChange={(event) => setAccountId(event.target.value)} required /></label><label>Offer code<input value={couponCode} onChange={(event) => setCouponCode(event.target.value)} required /></label><button type="submit" disabled={loading}>{loading ? "Opening checkout…" : "Pay ₹1 in Test Mode"}</button></form>{message && <div role="status">{message}</div>}<small>Sentinel stores hashed browser and network fingerprints only. It never stores card numbers or CVVs.</small></section></main>;
 }

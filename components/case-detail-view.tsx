@@ -27,7 +27,7 @@ function formatDate(timestamp: string) {
 }
 
 function plainSignal(signal: Evidence, couponCode: string) {
-  if (signal.kind === "device") return "The signups look like they used the same device.";
+  if (signal.kind === "device") return "The signups appear to use the same browser.";
   if (signal.kind === "payment") return "The signups used the same payment method.";
   if (signal.kind === "address") return "The signups used the same delivery address.";
   if (signal.kind === "ip") return "The signups came from the same network. This can be normal for a home, office, hotel, or mobile network.";

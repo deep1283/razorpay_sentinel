@@ -3,7 +3,7 @@ import type { Account, DashboardSnapshot, Evidence, RecommendedAction, RingCase,
 import { loadLiveCheckoutData } from "./live-data";
 
 const signalRules = [
-  { key: "deviceHash", kind: "device", label: "Shared device", weight: 30, strength: "strong" as const },
+  { key: "deviceHash", kind: "device", label: "Shared browser fingerprint", weight: 30, strength: "strong" as const },
   { key: "paymentTokenHash", kind: "payment", label: "Shared payment instrument", weight: 34, strength: "strong" as const },
   { key: "addressHash", kind: "address", label: "Shared delivery address", weight: 13, strength: "medium" as const },
   { key: "ipHash", kind: "ip", label: "Shared network fingerprint", weight: 7, strength: "weak" as const },

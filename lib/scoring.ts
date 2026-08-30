@@ -32,8 +32,23 @@ export function riskDecision(score: number): { level: RiskLevel; action: Recomme
 }
 
 export function scoreRings(input = accounts, inputRedemptions = redemptions): RingCase[] {
-  const links = signalRules.map((rule) => ({ ...rule, groups: grouped(input, rule.key) }));
-  const parent = new Map(input.map((account) => [account.id, account.id]));
+  const couponByAccount = new Map<string, string>();
+  for (const redemption of inputRedemptions) {
+    if (!couponByAccount.has(redemption.accountId)) couponByAccount.set(redemption.accountId, redemption.code);
+  }
+  const paidInput = input.filter((account) => couponByAccount.has(account.id));
+  const links = signalRules.map((rule) => {
+    const groups = Object.values(grouped(paidInput, rule.key)).flatMap((members) => {
+      const membersByCoupon = members.reduce<Record<string, Account[]>>((map, member) => {
+        const couponCode = couponByAccount.get(member.id);
+        if (couponCode) (map[couponCode] ??= []).push(member);
+        return map;
+      }, {});
+      return Object.values(membersByCoupon);
+    });
+    return { ...rule, groups };
+  });
+  const parent = new Map(paidInput.map((account) => [account.id, account.id]));
   const find = (id: string): string => {
     const root = parent.get(id) ?? id;
     if (root === id) return id;
@@ -47,25 +62,25 @@ export function scoreRings(input = accounts, inputRedemptions = redemptions): Ri
     if (firstRoot !== secondRoot) parent.set(secondRoot, firstRoot);
   };
   for (const link of links) {
-    for (const members of Object.values(link.groups)) {
+    for (const members of link.groups) {
       for (const member of members.slice(1)) join(members[0].id, member.id);
     }
   }
   const components = new Map<string, Account[]>();
-  for (const account of input) (components.get(find(account.id)) ?? components.set(find(account.id), []).get(find(account.id))!).push(account);
+  for (const account of paidInput) (components.get(find(account.id)) ?? components.set(find(account.id), []).get(find(account.id))!).push(account);
   const candidates = [...components.values()].filter((members) => {
     if (members.length < 3) return false;
     const ids = new Set(members.map((member) => member.id));
-    const strongLinks = links.filter((link) => (link.kind === "device" || link.kind === "payment" || link.kind === "email" || link.kind === "phone") && Object.values(link.groups).some((group) => group.length >= 2 && group.every((member) => ids.has(member.id))));
+    const strongLinks = links.filter((link) => (link.kind === "device" || link.kind === "payment" || link.kind === "email" || link.kind === "phone") && link.groups.some((group) => group.length >= 2 && group.every((member) => ids.has(member.id))));
     return strongLinks.length > 0;
   });
   const presetIds = ["RNG-024", "RNG-118", "RNG-209", "RNG-512", "RNG-680"];
   return candidates.map((members, index) => {
     const accountIds = members.map((member) => member.id);
     const accountIdSet = new Set(accountIds);
-    const shared = links.flatMap((link) => Object.values(link.groups).filter((group) => group.length >= 2 && group.every((member) => accountIdSet.has(member.id))).map((group) => ({ ...link, members: group })));
-    const couponEntries = inputRedemptions.filter((redemption) => accountIds.includes(redemption.accountId));
-    const couponCode = couponEntries[0]?.code ?? "UNKNOWN";
+    const shared = links.flatMap((link) => link.groups.filter((group) => group.length >= 2 && group.every((member) => accountIdSet.has(member.id))).map((group) => ({ ...link, members: group })));
+    const couponCode = couponByAccount.get(accountIds[0]) ?? "UNKNOWN";
+    const couponEntries = inputRedemptions.filter((redemption) => accountIds.includes(redemption.accountId) && redemption.code === couponCode);
     const evidence: Evidence[] = shared.map((signal) => ({ kind: signal.kind, label: signal.label, detail: `${String(signal.members[0][signal.key]).replace("pay_", "•••• ")} · ${signal.members.length} accounts`, strength: signal.strength, contribution: signal.weight, accountIds: signal.members.map((member) => member.id) }));
     const window = timeWindowMinutes(members);
     if (window <= 30 && couponEntries.length === members.length) evidence.push({ kind: "timing", label: "Synchronized coupon redemption", detail: `${window} minutes · ${couponCode}`, strength: "medium", contribution: 19, accountIds });

@@ -97,3 +97,27 @@ test("finds a connected ring when each account shares only part of the evidence"
   assert.ok(ring.evidence.some((item) => item.kind === "payment"));
   assert.ok(ring.evidence.some((item) => item.kind === "referral"));
 });
+
+test("keeps shared identities separated by promo offer", () => {
+  const mixedOfferAccounts = Array.from({ length: 6 }, (_, index): Account => ({
+    id: `M-${index + 1}`,
+    createdAt: `2026-08-29T13:0${index}:00Z`,
+    deviceHash: `browser-${index}`,
+    paymentTokenHash: "shared-across-offers",
+    addressHash: `address-${index}`,
+    ipHash: `ip-${index}`,
+  }));
+  const mixedOfferRedemptions: CouponRedemption[] = mixedOfferAccounts.map((account, index) => ({
+    accountId: account.id,
+    code: index < 3 ? "NEW500" : "WELCOME30",
+    discountInr: index < 3 ? 500 : 300,
+    redeemedAt: account.createdAt,
+  }));
+
+  const rings = scoreRings(mixedOfferAccounts, mixedOfferRedemptions);
+
+  assert.equal(rings.length, 2);
+  assert.deepEqual(rings.map((ring) => ring.couponCode), ["NEW500", "WELCOME30"]);
+  assert.deepEqual(rings.map((ring) => ring.accountIds.length), [3, 3]);
+  assert.deepEqual(rings.map((ring) => ring.exposureInr), [1500, 900]);
+});

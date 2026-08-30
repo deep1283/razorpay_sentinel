@@ -1446,10 +1446,9 @@
 }
 
 .primer-proof-logos b:nth-child(3) {
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 19px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
   color: #3b5047;
 }
 

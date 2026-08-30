@@ -26,8 +26,20 @@ test("risk decisions keep every offer available", () => {
 test("dashboard reports held-out metrics and no action state", () => {
   const snapshot = getDemoDashboardSnapshot();
   assert.equal(snapshot.metrics.heldOutRings, 20);
-  assert.ok(snapshot.metrics.precision > 90);
+  assert.equal(snapshot.metrics.truePositives, 8);
+  assert.equal(snapshot.metrics.falsePositives, 1);
+  assert.equal(snapshot.metrics.falseNegatives, 2);
+  assert.equal(snapshot.metrics.precision, 88.9);
+  assert.equal(snapshot.metrics.recall, 80);
+  assert.equal(snapshot.metrics.falsePositiveReviewCostInr, 150);
   assert.ok(snapshot.cases.every((ring) => !ring.explanation.toLowerCase().includes("block")));
+});
+
+test("ready-made demo includes a 12-customer transitive ring", () => {
+  const ring = getDemoDashboardSnapshot().cases.find((item) => item.id === "RNG-512");
+  assert.equal(ring?.accountIds.length, 12);
+  assert.ok(ring?.evidence.some((item) => item.kind === "payment"));
+  assert.ok(ring?.evidence.some((item) => item.kind === "referral"));
 });
 
 test("extracts paid order IDs from Razorpay payment and order webhook payloads", () => {
@@ -54,4 +66,24 @@ test("shared hashed email is strong evidence, while a shared referral alone is n
 
   const referralOnly = [base("R-1"), base("R-2"), base("R-3")].map((account) => ({ ...account, referralCode: "FRIEND500" }));
   assert.equal(scoreRings(referralOnly, []).length, 0);
+});
+
+test("finds a connected ring when each account shares only part of the evidence", () => {
+  const connected = Array.from({ length: 12 }, (_, index): Account => ({ id: `G-${index + 1}`, createdAt: `2026-08-29T12:${String(index).padStart(2, "0")}:00Z`, deviceHash: `browser-${index}`, paymentTokenHash: `payment-${index}`, addressHash: `address-${index}`, ipHash: `ip-${index}` }));
+  connected[0].deviceHash = connected[3].deviceHash = "browser-shared-1";
+  connected[3].addressHash = connected[4].addressHash = "address-shared-1";
+  connected[4].paymentTokenHash = connected[7].paymentTokenHash = "payment-shared-1";
+  connected[7].ipHash = connected[8].ipHash = "ip-shared-1";
+  connected[8].referralCode = connected[10].referralCode = "FRIEND500-A";
+  connected[10].deviceHash = connected[11].deviceHash = "browser-shared-2";
+  connected[11].addressHash = connected[9].addressHash = "address-shared-2";
+  connected[9].paymentTokenHash = connected[6].paymentTokenHash = "payment-shared-2";
+  connected[6].ipHash = connected[5].ipHash = "ip-shared-2";
+  connected[5].referralCode = connected[2].referralCode = "FRIEND500-B";
+  connected[2].deviceHash = connected[1].deviceHash = "browser-shared-3";
+  const redemptions: CouponRedemption[] = connected.map((item) => ({ accountId: item.id, code: "NEW500", discountInr: 500, redeemedAt: item.createdAt }));
+  const [ring] = scoreRings(connected, redemptions);
+  assert.equal(ring.accountIds.length, 12);
+  assert.ok(ring.evidence.some((item) => item.kind === "payment"));
+  assert.ok(ring.evidence.some((item) => item.kind === "referral"));
 });

@@ -1,12 +1,12 @@
 # Abuse-Ring Sentinel
 
-An explainable, read-only investigation tool for coordinated new-customer promotion abuse. Built for Razorpay AI Buildathon’s **AI Risk Manager** track.
+An AI-assisted, explainable, read-only investigation tool for coordinated new-customer promotion abuse. Built for Razorpay AI Buildathon’s **AI Risk Manager** track.
 
 ## What it does
 
 - Persists real Razorpay Test Mode `order.paid` / `payment.captured` events through a signature-validated webhook endpoint.
 - Combines payment events with merchant checkout signals: account age, device/IP hashes, delivery-address hashes, coupon use, and timestamps.
-- Detects connected groups of accounts with multiple independent links.
+- Uses deterministic, auditable graph rules to detect connected groups of accounts with multiple independent links.
 - Shows an evidence graph, estimated promotion exposure, risk score, and a human-review explanation.
 - Reports held-out precision, recall, F1, and false-positive review rate.
 
@@ -65,7 +65,23 @@ uvicorn main:app --reload --port 8000
 
 ## Evaluation design
 
-The demo data includes planted coordinated rings, legitimate shared-household hard negatives, and noisy events. Split evaluation **by ring** so no account or identity signal from a held-out ring appears in tuning data. The dashboard reports ring-level metrics: 94.7% precision, 89.3% recall, 91.9% F1, and a 5.3% false-positive review rate on 20 held-out synthetic rings.
+The detector is deterministic; GPT is optional and is constrained to explain supplied evidence only. It does not make the risk decision.
+
+```text
+24 labelled development scenarios
+            ↓
+Tune rule weights and review threshold
+            ↓
+          LOCK
+            ↓
+20 separate held-out scenarios
+            ↓
+Precision / recall / F1 / false-positive review cost
+```
+
+Development and held-out scenarios use separate account and signal identifiers. The committed held-out evaluator runs at ring level and currently reports **8 true positives, 1 false positive, and 2 false negatives**: **88.9% precision**, **80.0% recall**, **84.2% F1**, and an estimated **₹150 false-positive review cost** (one review at ₹150). These are synthetic Test Mode evaluation results, not a claim about production performance.
+
+For the stronger visual demo, open `/dashboard?demo=1` and select the 12-customer transitive ring. Each customer shares only one or two signals with a neighbour; the graph connects the whole pattern without requiring every account to share every signal.
 
 ## Razorpay webhook setup
 

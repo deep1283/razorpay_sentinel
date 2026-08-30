@@ -18,7 +18,7 @@ function plainReason(ring: RingCase) {
   return `We noticed ${signals.join(" and ")} across these signups.`;
 }
 
-export function DashboardClient({ initial, initialError }: { initial: DashboardSnapshot | null; initialError?: string }) {
+export function DashboardClient({ initial, initialError, isDemo = false }: { initial: DashboardSnapshot | null; initialError?: string; isDemo?: boolean }) {
   const [data, setData] = useState(initial);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(initialError ?? "");
@@ -36,7 +36,7 @@ export function DashboardClient({ initial, initialError }: { initial: DashboardS
     setRefreshing(true);
     setError("");
     try {
-      const response = await fetch("/api/dashboard");
+      const response = await fetch(`/api/dashboard${isDemo ? "?demo=1" : ""}`);
       const payload = await response.json() as DashboardSnapshot | { error?: string };
       if (!response.ok || !("cases" in payload)) throw new Error("error" in payload ? payload.error : "The dashboard could not be refreshed.");
       setData(payload);
@@ -64,6 +64,8 @@ export function DashboardClient({ initial, initialError }: { initial: DashboardS
           <article><span>Customers involved</span><strong>{accountsToReview}</strong><p>people connected by one or more signals</p></article>
         </section>
 
+        {data && <section className="brief-evaluation" aria-label="Held-out evaluation results"><div><p>LOCKED HELD-OUT EVALUATION</p><h2>Measured on data held outside tuning</h2><span>{data.metrics.heldOutRings} ring scenarios · {data.metrics.truePositives} detected · {data.metrics.falsePositives} false reviews · ₹{data.metrics.falsePositiveReviewCostInr} estimated review cost</span></div><dl><div><dt>Precision</dt><dd>{data.metrics.precision}%</dd></div><div><dt>Recall</dt><dd>{data.metrics.recall}%</dd></div><div><dt>F1 score</dt><dd>{data.metrics.f1}%</dd></div></dl></section>}
+
         <section className="brief-list-section">
           {sortedCases.length === 0 ? <Link href="/connect" className="brief-start-tracking">Connect to Razorpay to start tracking <b>→</b></Link> : <><div className="brief-list-heading"><div><p>RISK CHECKS</p><h2>Suspicious activity to review</h2></div><span>{sortedCases.length} groups found</span></div>
           <div className="brief-case-list">
@@ -74,7 +76,7 @@ export function DashboardClient({ initial, initialError }: { initial: DashboardS
                 <div className="brief-case-description"><div><b>{ring.accountIds.length} customers</b></div><p>{plainReason(ring)}</p></div>
                 <div className="brief-case-offer"><span>Offer used</span><b>{ring.couponCode}</b></div>
                 <div className="brief-case-value"><span>Risk score</span><b>{ring.score}%</b></div>
-                <Link href={`/cases/${ring.id}`} aria-label={`View signup pattern ${ring.id}`}>View <b>→</b></Link>
+                <Link href={`/cases/${ring.id}${isDemo ? "?demo=1" : ""}`} aria-label={`View signup pattern ${ring.id}`}>View <b>→</b></Link>
               </article>;
             })}
           </div></>}

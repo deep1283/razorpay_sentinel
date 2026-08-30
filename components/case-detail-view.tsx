@@ -40,14 +40,14 @@ function plainSignal(signal: Evidence, couponCode: string) {
   return "These customers share another detail worth checking.";
 }
 
-export function CaseDetailView({ ring }: { ring: RingCase }) {
+export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDemo?: boolean }) {
   const [activeTab, setActiveTab] = useState<Tab>("graph");
   const members = useMemo(() => ring.members ?? ring.accountIds.map((id) => accounts.find((account) => account.id === id)).filter((account): account is Account => Boolean(account)), [ring.accountIds, ring.members]);
   const signals = ring.evidence.filter((evidence) => evidence.accountIds.length > 1);
   const exposureByAccount = useMemo(() => new Map((ring.redemptions ?? redemptions).filter((item) => ring.accountIds.includes(item.accountId)).map((item) => [item.accountId, item])), [ring.accountIds, ring.redemptions]);
 
   return <main className="case-page">
-    <header className="case-header"><Link href="/dashboard?guest=1">← Back to dashboard</Link><div><span>Risk score</span><b>{ring.score}%</b></div></header>
+    <header className="case-header"><Link href={`/dashboard?guest=1${isDemo ? "&demo=1" : ""}`}>← Back to dashboard</Link><div><span>Risk score</span><b>{ring.score}%</b></div></header>
     <div className="case-shell">
       <nav className="case-tabs" aria-label="Case views">
         {(["graph", "accounts", "evidence"] as Tab[]).map((tab) => <button key={tab} type="button" className={activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)}>{tab === "graph" ? "Overview" : tab === "accounts" ? `Customers (${members.length})` : "What we noticed"}</button>)}

@@ -70,11 +70,21 @@ Merchant checkout details + Razorpay paid-order webhook
 8. In the case overview, explain the simple-English reasons: same browser, identity, address, network, referral source, payment method when available, and offer timing.
 9. Open **What we noticed** to show that Sentinel is evidence-first and recommends review rather than an automatic penalty.
 
-For a ready-made graph demonstration, open `/dashboard?demo=1`. The 12-customer `RNG-512` case is a connected ring: each customer has only a partial link to another customer, such as a browser, address, payment method, network, or referral. No single account contains every signal, but the graph reveals the connected pattern.
+## Dashboard modes
+
+Sentinel uses one dashboard route with clear URL modes:
+
+| URL | What it shows | Sign-in |
+| --- | --- | --- |
+| `/dashboard` | Live Razorpay and Supabase data | Required when Supabase auth is active |
+| `/dashboard?guest=1` | The same live dashboard, without the sign-in check | Not required |
+| `/dashboard?guest=1&demo=1` | Seeded visual demo data, including the 12-customer ring | Not required |
+
+Use `/dashboard?guest=1&demo=1` for a ready-made graph demonstration. The 12-customer `RNG-512` case is a connected ring: each customer has only a partial link to another customer, such as a browser, address, payment method, network, or referral. No single account contains every signal, but the graph reveals the connected pattern.
 
 ## Measured detector evaluation
 
-The required evaluation is built into the app and shown on the dashboard. It is kept separate from the visual demo data:
+The required evaluation is built into the app and shown on the separate **Test results** page at `/test-results`. It is kept separate from the visual demo data:
 
 ```text
 120 labelled development scenarios

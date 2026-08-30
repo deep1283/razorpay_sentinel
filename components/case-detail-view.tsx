@@ -29,15 +29,15 @@ function formatDate(timestamp: string) {
 }
 
 function plainSignal(signal: Evidence, couponCode: string) {
-  if (signal.kind === "device") return "The signups appear to use the same browser.";
-  if (signal.kind === "payment") return "The signups used the same payment method.";
-  if (signal.kind === "address") return "The signups used the same delivery address.";
-  if (signal.kind === "ip") return "The signups came from the same network. This can be normal for a home, office, hotel, or mobile network.";
-  if (signal.kind === "email") return "The signups used the same hashed email identity.";
-  if (signal.kind === "phone") return "The signups used the same hashed phone identity.";
-  if (signal.kind === "referral") return "The signups came through the same referral source.";
-  if (signal.kind === "timing") return `The signups used ${couponCode} within a short time of each other.`;
-  return "The signups share another detail worth checking.";
+  if (signal.kind === "device") return "These customers used the same browser.";
+  if (signal.kind === "payment") return "These customers used the same way to pay.";
+  if (signal.kind === "address") return "These customers used the same delivery address.";
+  if (signal.kind === "ip") return "These customers used the same internet connection. This can happen at a home, office, hotel, or on mobile data.";
+  if (signal.kind === "email") return "These customers used the same email address.";
+  if (signal.kind === "phone") return "These customers used the same phone number.";
+  if (signal.kind === "referral") return "These customers used the same referral code.";
+  if (signal.kind === "timing") return `These customers used ${couponCode} close together.`;
+  return "These customers share another detail worth checking.";
 }
 
 export function CaseDetailView({ ring }: { ring: RingCase }) {

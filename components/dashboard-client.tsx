@@ -68,8 +68,6 @@ export function DashboardClient({ initial, initialError, isDemo = false }: { ini
           <article><span>Customers involved</span><strong>{accountsToReview}</strong><p>people connected by one or more signals</p></article>
         </section>
 
-        {data && <section className="brief-evaluation" aria-label="Held-out evaluation results"><div><p>LOCKED HELD-OUT EVALUATION</p><h2>Measured on data held outside tuning</h2><span>{data.metrics.heldOutScenarios} labelled scenarios · threshold {data.metrics.reviewThreshold} · {data.metrics.truePositives} detected · {data.metrics.falsePositives} false reviews · ₹{data.metrics.falsePositiveReviewCostInr} estimated review cost</span></div><dl><div><dt>Precision</dt><dd>{data.metrics.precision}%</dd></div><div><dt>Recall</dt><dd>{data.metrics.recall}%</dd></div><div><dt>F1 score</dt><dd>{data.metrics.f1}%</dd></div></dl></section>}
-
         <section className="brief-list-section">
           {sortedCases.length === 0 ? <Link href="/connect" className="brief-start-tracking">Connect to Razorpay to start tracking <b>→</b></Link> : <><div className="brief-list-heading"><div><p>RISK CHECKS</p><h2>Suspicious activity to review</h2></div><span>{sortedCases.length} groups found</span></div>
           <div className="brief-case-list">

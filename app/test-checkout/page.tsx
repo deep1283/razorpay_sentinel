@@ -3,7 +3,8 @@
 import { FormEvent, useState } from "react";
 import { TEST_PAYMENT_AMOUNT_INR } from "@/lib/test-checkout";
 
-declare global { interface Window { Razorpay?: new (options: Record<string, unknown>) => { open: () => void }; } }
+type RazorpayCheckout = { open: () => void; on: (event: "payment.failed", handler: () => void) => void };
+declare global { interface Window { Razorpay?: new (options: Record<string, unknown>) => RazorpayCheckout; } }
 
 const browserIdKey = "sentinel_browser_id";
 
@@ -40,7 +41,9 @@ export default function TestCheckoutPage() {
       const order = await response.json() as { error?: string; orderId?: string; amount?: number; currency?: string; keyId?: string };
       if (!response.ok || !order.orderId || !order.keyId) throw new Error(order.error ?? "Could not start the Test Mode payment.");
       await loadCheckout();
-      new window.Razorpay!({ key: order.keyId, amount: order.amount, currency: order.currency, name: "Sentinel Test Checkout", description: `Test offer: ${couponCode}`, order_id: order.orderId, handler: () => setMessage("Payment completed. Razorpay will send the verified webhook shortly."), modal: { ondismiss: () => setMessage("Checkout closed. No payment was made.") }, theme: { color: "#2f6d51" } }).open();
+      const checkout = new window.Razorpay!({ key: order.keyId, amount: order.amount, currency: order.currency, name: "Sentinel Test Checkout", description: `Test offer: ${couponCode}`, order_id: order.orderId, handler: () => setMessage("Payment submitted. Sentinel is waiting for Razorpay's verified webhook."), modal: { ondismiss: () => setMessage("Checkout closed. No completed payment will be added to Sentinel.") }, theme: { color: "#2f6d51" } });
+      checkout.on("payment.failed", () => setMessage("Payment failed. You can retry in Razorpay Checkout; Sentinel will not add a case unless payment succeeds."));
+      checkout.open();
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not start the Test Mode payment."); }
     finally { setLoading(false); }
   }

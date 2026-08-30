@@ -43,7 +43,18 @@ function plainSignal(signal: Evidence, couponCode: string) {
 export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDemo?: boolean }) {
   const [activeTab, setActiveTab] = useState<Tab>("graph");
   const members = useMemo(() => ring.members ?? ring.accountIds.map((id) => accounts.find((account) => account.id === id)).filter((account): account is Account => Boolean(account)), [ring.accountIds, ring.members]);
-  const signals = ring.evidence.filter((evidence) => evidence.accountIds.length > 1);
+  // A connected case can contain several links of the same kind (for example,
+  // more than one shared browser). Show that reason once in plain English,
+  // while leaving every underlying link available to the scorer.
+  const signals = useMemo(() => {
+    const shownKinds = new Set<Evidence["kind"]>();
+
+    return ring.evidence.filter((evidence) => {
+      if (evidence.accountIds.length < 2 || shownKinds.has(evidence.kind)) return false;
+      shownKinds.add(evidence.kind);
+      return true;
+    });
+  }, [ring.evidence]);
   const exposureByAccount = useMemo(() => new Map((ring.redemptions ?? redemptions).filter((item) => ring.accountIds.includes(item.accountId)).map((item) => [item.accountId, item])), [ring.accountIds, ring.redemptions]);
 
   return <main className="case-page">
@@ -61,7 +72,7 @@ export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDem
           </ul>
         </div>
         <div className="case-ring-panel">
-          <div className="circle-graph" role="img" aria-label={`Circular evidence map for case ${ring.id}, with ${members.length} accounts and ${signals.length} shared signals`}>
+          <div className="circle-graph" role="img" aria-label={`Circular evidence map for case ${ring.id}, with ${members.length} accounts and ${signals.length} types of shared signal`}>
             <svg viewBox="0 0 700 700" aria-hidden="true">
               <circle cx="350" cy="350" r="260" className="circle-guide outer" />
               {members.map((member, index) => { const point = pointOnCircle(index, members.length, 260); return <line key={member.id} x1="350" y1="350" x2={point.x} y2={point.y} className="circle-member-line" />; })}
@@ -74,7 +85,7 @@ export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDem
 
       {activeTab === "accounts" && <section className="case-data-card"><div className="case-data-heading"><h2>Customers in this check</h2><p>These customers used the same offer. They may still be separate people.</p></div><div className="case-table-scroll"><table><thead><tr><th>Customer</th><th>Joined</th><th>Offer used</th></tr></thead><tbody>{members.map((member) => { const redemption = exposureByAccount.get(member.id); return <tr key={member.id}><td><span className="case-customer-id">{member.id}</span></td><td>{formatDate(member.createdAt)}</td><td>{redemption ? <div className="case-offer-cell"><span className="case-coupon-badge">{redemption.code}</span><span className="case-coupon-amount">₹{redemption.discountInr.toLocaleString("en-IN")}</span></div> : "—"}</td></tr>; })}</tbody></table></div></section>}
 
-      {activeTab === "evidence" && <section className="case-evidence-grid">{signals.map((signal, index) => { const style = styles[signal.kind]; return <article key={`${signal.kind}-${index}`}><div><span style={{ backgroundColor: style.color }} />Signal</div><h2>{plainSignal(signal, ring.couponCode)}</h2><p>This appears across all {signal.accountIds.length} customers in this check.</p></article>; })}</section>}
+      {activeTab === "evidence" && <section className="case-evidence-grid">{signals.map((signal, index) => { const style = styles[signal.kind]; return <article key={`${signal.kind}-${index}`}><div><span style={{ backgroundColor: style.color }} />Signal</div><h2>{plainSignal(signal, ring.couponCode)}</h2><p>This signal connects {signal.accountIds.length} customers in this check.</p></article>; })}</section>}
     </div>
   </main>;
 }

@@ -77,18 +77,20 @@ For a ready-made graph demonstration, open `/dashboard?demo=1`. The 12-customer 
 The required evaluation is built into the app and shown on the dashboard. It is kept separate from the visual demo data:
 
 ```text
-24 labelled development scenarios
+120 labelled development scenarios
               ↓
 Tune scoring weights and review threshold
               ↓
             LOCK
               ↓
-20 held-out labelled scenarios
+100 held-out labelled scenarios
               ↓
 Precision · Recall · F1 · false-positive review cost
 ```
 
-Current held-out synthetic Test Mode result: **8 true positives, 1 false positive, and 2 false negatives**. That is **88.9% precision**, **80.0% recall**, and **84.2% F1**. The one false review is costed at **₹150**, so the false-positive review cost is **₹150**.
+Both sets use the same balanced 50/50 mix of coordinated-abuse labels and legitimate shared-household, family, office, kiosk, and campaign labels. They use the same scenario generator but different fixed random seeds, and never share account or signal identifiers. Only the development set selects the F1-optimal review threshold of **65**; that value is locked before the held-out set is evaluated.
+
+Current untouched held-out synthetic Test Mode result: **50 true positives, 4 false positives, 0 false negatives, and 46 true negatives**. That is **92.6% precision**, **100.0% recall**, and **96.2% F1**. Four false reviews at an estimated ₹150 each produce a **₹600 false-positive review cost**.
 
 The important limitation is that these metrics are from labelled synthetic scenarios, not production merchant traffic. They are an honest, reproducible benchmark for the submission; real deployment needs merchant-labelled outcomes and a fresh held-out evaluation.
 

@@ -68,18 +68,20 @@ uvicorn main:app --reload --port 8000
 The detector is deterministic; GPT is optional and is constrained to explain supplied evidence only. It does not make the risk decision.
 
 ```text
-24 labelled development scenarios
+120 labelled development scenarios
             ↓
 Tune rule weights and review threshold
             ↓
           LOCK
             ↓
-20 separate held-out scenarios
+100 separate held-out scenarios
             ↓
 Precision / recall / F1 / false-positive review cost
 ```
 
-Development and held-out scenarios use separate account and signal identifiers. The committed held-out evaluator runs at ring level and currently reports **8 true positives, 1 false positive, and 2 false negatives**: **88.9% precision**, **80.0% recall**, **84.2% F1**, and an estimated **₹150 false-positive review cost** (one review at ₹150). These are synthetic Test Mode evaluation results, not a claim about production performance.
+Development and held-out scenarios use the same balanced 50/50 mix of abuse and legitimate-use labels and the same documented scenario generator, but use different fixed random seeds, account identifiers, and signal identifiers. Fast activity is more common in abuse but can also happen legitimately. The development set selects the F1-optimal threshold of **65**, which is then locked before the held-out set is scored.
+
+The untouched held-out evaluator currently reports **50 true positives, 4 false positives, 0 false negatives, and 46 true negatives**: **92.6% precision**, **100.0% recall**, **96.2% F1**, and an estimated **₹600 false-positive review cost** (four reviews at ₹150). These are reproducible synthetic Test Mode results, not a claim about production performance.
 
 For the stronger visual demo, open `/dashboard?demo=1` and select the 12-customer transitive ring. Each customer shares only one or two signals with a neighbour; the graph connects the whole pattern without requiring every account to share every signal.
 

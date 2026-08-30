@@ -2,6 +2,7 @@ import { accounts, redemptions } from "./demo-data";
 import type { Account, DashboardSnapshot, Evidence, RecommendedAction, RingCase, RiskLevel } from "./domain";
 import { loadLiveCheckoutData } from "./live-data";
 import { evaluateHeldOut } from "./evaluation";
+import { REVIEW_THRESHOLD } from "./scoring-config";
 
 const signalRules = [
   { key: "deviceHash", kind: "device", label: "Shared browser fingerprint", weight: 30, strength: "strong" as const },
@@ -13,7 +14,7 @@ const signalRules = [
   { key: "referralCode", kind: "referral", label: "Shared referral source", weight: 11, strength: "medium" as const },
 ] as const;
 
-export const REVIEW_THRESHOLD = 75;
+export { REVIEW_THRESHOLD } from "./scoring-config";
 
 function grouped<T extends keyof Account>(input: Account[], key: T) {
   return input.reduce<Record<string, Account[]>>((map, account) => { const value = account[key]; if (value) (map[String(value)] ??= []).push(account); return map; }, {});
@@ -25,7 +26,7 @@ function timeWindowMinutes(input: Account[]) {
 }
 
 export function riskDecision(score: number): { level: RiskLevel; action: RecommendedAction; detail: string } {
-  if (score >= 75) return { level: "high", action: "Keep offer available · review", detail: "Keep the offer available. Your team can review this pattern later; it is not proof of wrongdoing." };
+  if (score >= REVIEW_THRESHOLD) return { level: "high", action: "Keep offer available · review", detail: "Keep the offer available. Your team can review this pattern later; it is not proof of wrongdoing." };
   if (score >= 40) return { level: "medium", action: "Keep offer available · optional verification", detail: "Keep the offer available. If it fits your process, you may invite the customer to complete a simple verification." };
   return { level: "low", action: "Keep offer available", detail: "Keep the offer available and continue to watch for additional signals." };
 }

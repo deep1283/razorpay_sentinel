@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { getDemoDashboardSnapshot, riskDecision, scoreRings } from "../lib/scoring";
 import { razorpayOrderId } from "../lib/live-data";
+import { chooseDevelopmentThreshold } from "../lib/evaluation";
+import { REVIEW_THRESHOLD } from "../lib/scoring-config";
 import type { Account, CouponRedemption } from "../lib/domain";
 
 test("high-signal seeded ring is scored without restricting the offer", () => {
@@ -25,14 +27,22 @@ test("risk decisions keep every offer available", () => {
 
 test("dashboard reports held-out metrics and no action state", () => {
   const snapshot = getDemoDashboardSnapshot();
-  assert.equal(snapshot.metrics.heldOutRings, 20);
-  assert.equal(snapshot.metrics.truePositives, 8);
-  assert.equal(snapshot.metrics.falsePositives, 1);
-  assert.equal(snapshot.metrics.falseNegatives, 2);
-  assert.equal(snapshot.metrics.precision, 88.9);
-  assert.equal(snapshot.metrics.recall, 80);
-  assert.equal(snapshot.metrics.falsePositiveReviewCostInr, 150);
+  assert.equal(snapshot.metrics.developmentScenarios, 120);
+  assert.equal(snapshot.metrics.heldOutScenarios, 100);
+  assert.equal(snapshot.metrics.reviewThreshold, 65);
+  assert.equal(snapshot.metrics.truePositives, 50);
+  assert.equal(snapshot.metrics.falsePositives, 4);
+  assert.equal(snapshot.metrics.falseNegatives, 0);
+  assert.equal(snapshot.metrics.trueNegatives, 46);
+  assert.equal(snapshot.metrics.precision, 92.6);
+  assert.equal(snapshot.metrics.recall, 100);
+  assert.equal(snapshot.metrics.f1, 96.2);
+  assert.equal(snapshot.metrics.falsePositiveReviewCostInr, 600);
   assert.ok(snapshot.cases.every((ring) => !ring.explanation.toLowerCase().includes("block")));
+});
+
+test("locked review threshold is selected using development data only", () => {
+  assert.equal(chooseDevelopmentThreshold().threshold, REVIEW_THRESHOLD);
 });
 
 test("ready-made demo includes a 12-customer transitive ring", () => {

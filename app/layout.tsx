@@ -22,7 +22,7 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Abuse-Ring Sentinel",
+  title: "Sentinel",
   description: "Explainable promotion-abuse intelligence for merchant investigators.",
 };
 

@@ -157,7 +157,7 @@ export function CommerceShowcase() {
         <div className="primer-cta-content">
           <p className="primer-cta-kicker"><span className="kicker-dash" />CONTACT</p>
           <h2>Make every promotion harder to exploit.</h2>
-          <p className="primer-cta-desc">Bring your first webhook event, and we’ll help you find the hidden connections.</p>
+          <p className="primer-cta-desc">Connect your Razorpay account, and we’ll help you protect your discounts from repeat abuse.</p>
           <Link href="/login" className="primer-cta-action">Get started <b>→</b></Link>
         </div>
         <div className="primer-cta-card">

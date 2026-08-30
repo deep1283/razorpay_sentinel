@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { SentinelLogo } from "@/components/ui/sentinel-logo";
 
+const fallbackWebhookUrl = "https://your-public-domain.com/api/webhooks/razorpay";
+const subscribeToOrigin = () => () => {};
+const browserWebhookUrl = () => window.location.protocol === "https:" && window.location.hostname !== "localhost" ? `${window.location.origin}/api/webhooks/razorpay` : fallbackWebhookUrl;
+
 export default function ConnectRazorpayPage() {
-  const [webhookUrl, setWebhookUrl] = useState("https://your-public-domain.com/api/webhooks/razorpay");
-  useEffect(() => {
-    if (window.location.protocol === "https:" && window.location.hostname !== "localhost") setWebhookUrl(`${window.location.origin}/api/webhooks/razorpay`);
-  }, []);
+  const webhookUrl = useSyncExternalStore(subscribeToOrigin, browserWebhookUrl, () => fallbackWebhookUrl);
 
   return <main className="connect-page">
     <header className="connect-topbar"><Link href="/dashboard?guest=1" className="brief-brand flex items-center gap-2"><SentinelLogo size={20} className="rounded-md" /> Sentinel</Link><Link href="/dashboard?guest=1">Back to dashboard</Link></header>

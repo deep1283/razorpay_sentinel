@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
@@ -8,7 +9,6 @@ import {
   GlassCard,
   GlassCardHeader,
   GlassCardTitle,
-  GlassCardAction,
   GlassCardContent,
   GlassCardFooter,
 } from "@/components/ui/glass-card";
@@ -119,10 +119,13 @@ export function LoginForm() {
   return (
     <div className="relative w-full h-screen flex items-center justify-center overflow-hidden font-sans">
       {/* Crisp high-resolution clouds and mountain background */}
-      <img
+      <Image
         src="/login-clouds.jpg"
         alt="Mountain and sky landscape background"
         className="absolute inset-0 w-full h-full object-cover object-center"
+        fill
+        priority
+        sizes="100vw"
       />
 
       <GlassCard className="w-full max-w-[390px] relative z-10 bg-white/40 border-white/50 backdrop-blur-2xl rounded-3xl shadow-2xl p-2 py-7 text-zinc-900">

@@ -1,13 +1,17 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SentinelLogo } from "@/components/ui/sentinel-logo";
 
 export function SentinelHero() {
   return (
     <section className="sentinel-hero-center">
-      <img
+      <Image
         className="hero-landscape-full"
         src="/ghibli-robot-hero.webp"
         alt="Sentinel hero landscape"
+        fill
+        priority
+        sizes="100vw"
       />
 
       <header className="landing-header hero-header-overlay">

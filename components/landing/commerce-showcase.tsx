@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { SentinelLogo } from "@/components/ui/sentinel-logo";
 
@@ -43,10 +44,13 @@ function SignalVisual({ type }: { type: string }) {
   if (type === "graph") {
     return (
       <div className="primer-graph-visual" aria-hidden="true">
-        <img
+        <Image
           src="/sentinel-home.png"
           alt="Sentinel ring evidence graph"
           className="primer-graph-image"
+          width={1280}
+          height={720}
+          sizes="(max-width: 800px) 100vw, 50vw"
         />
         <div className="primer-risk-chip">Shared promo ring <b>94</b></div>
       </div>
@@ -127,10 +131,13 @@ export function CommerceShowcase() {
           <article className="primer-product-card primer-product-coral"><div className="primer-card-ui"><span>PAYMENT EVENT</span><b>order.paid</b><i>→</i></div><h3>Catch repeat abuse in real time</h3><p>Passive webhook ingestion, normalized in moments.</p><Link href="/dashboard">View signals <b>→</b></Link></article>
           <article className="primer-product-card primer-product-yellow">
             <div className="primer-network">
-              <img
+              <Image
                 src="/sentinel-home.png"
                 alt="Shared thread evidence ring"
                 className="primer-network-img"
+                width={1280}
+                height={720}
+                sizes="(max-width: 800px) 100vw, 50vw"
               />
             </div>
             <h3>Follow the shared thread</h3>

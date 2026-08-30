@@ -15,7 +15,6 @@ function Metric({ label, value, detail }: { label: string; value: string; detail
 export default function TestResultsPage() {
   const metrics = evaluateHeldOut();
   const actualAbuse = metrics.truePositives + metrics.falseNegatives;
-  const actualLegitimate = metrics.trueNegatives + metrics.falsePositives;
   const reviewed = metrics.truePositives + metrics.falsePositives;
 
   return <main className="test-results-page">

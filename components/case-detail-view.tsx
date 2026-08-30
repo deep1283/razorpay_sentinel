@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { CaseExplanation } from "@/components/case-explanation";
 import { accounts, redemptions } from "@/lib/demo-data";
 import type { Account, Evidence, RingCase } from "@/lib/domain";
 
@@ -21,7 +22,10 @@ const styles: Record<Evidence["kind"], { color: string; label: string }> = {
 
 function pointOnCircle(index: number, count: number, radius: number, startAngle = -Math.PI / 2) {
   const angle = startAngle + (index * (Math.PI * 2)) / Math.max(count, 1);
-  return { x: 350 + Math.cos(angle) * radius, y: 350 + Math.sin(angle) * radius };
+  return {
+    x: Number((350 + Math.cos(angle) * radius).toFixed(4)),
+    y: Number((350 + Math.sin(angle) * radius).toFixed(4)),
+  };
 }
 
 function formatDate(timestamp: string) {
@@ -86,7 +90,7 @@ export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDem
               <circle cx="350" cy="350" r="260" className="circle-guide outer" />
               {members.map((member) => { const point = memberPoints.get(member.id)!; return <line key={member.id} x1="350" y1="350" x2={point.x} y2={point.y} className="circle-member-line" />; })}
             </svg>
-            {members.map((member) => { const point = memberPoints.get(member.id)!; return <div className="circle-account" key={member.id} style={{ left: `${(point.x / 700) * 100}%`, top: `${(point.y / 700) * 100}%` }}><span>Customer</span><b>{member.id}</b></div>; })}
+            {members.map((member) => { const point = memberPoints.get(member.id)!; return <div className="circle-account" key={member.id} style={{ left: `${(point.x / 7).toFixed(4)}%`, top: `${(point.y / 7).toFixed(4)}%` }}><span>Customer</span><b>{member.id}</b></div>; })}
             <div className="circle-center"><span>OFFER</span><b>{ring.couponCode}</b><small>{members.length} customers</small></div>
           </div>
         </div>
@@ -94,7 +98,7 @@ export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDem
 
       {activeTab === "accounts" && <section className="case-data-card"><div className="case-data-heading"><h2>Customers in this check</h2><p>These customers used the same offer. They may still be separate people.</p></div><div className="case-table-scroll"><table><thead><tr><th>Customer</th><th>Joined</th><th>Offer used</th></tr></thead><tbody>{members.map((member) => { const redemption = exposureByAccount.get(member.id); return <tr key={member.id}><td><span className="case-customer-id">{member.id}</span></td><td>{formatDate(member.createdAt)}</td><td>{redemption ? <div className="case-offer-cell"><span className="case-coupon-badge">{redemption.code}</span><span className="case-coupon-amount">₹{redemption.discountInr.toLocaleString("en-IN")}</span></div> : "—"}</td></tr>; })}</tbody></table></div></section>}
 
-      {activeTab === "evidence" && <section className="case-evidence-grid">{signalGroups.map((group) => { const style = styles[group.signal.kind]; return <article key={group.signal.kind}><div><span style={{ backgroundColor: style.color }} />Signal</div><h2>{plainSignal(group.signal, ring.couponCode)}</h2><p>{group.links.length === 1 ? `This signal connects ${group.accountIds.length} customers in this check.` : `This type of signal appears in ${group.links.length} separate links, connecting ${group.accountIds.length} customers.`}</p><div className="case-evidence-links"><b>Connections</b><p>{group.links.map((link) => describeConnection(link.accountIds)).join(" · ")}</p></div></article>; })}</section>}
+      {activeTab === "evidence" && <section className="case-evidence-view"><section className="case-evidence-grid">{signalGroups.map((group) => { const style = styles[group.signal.kind]; return <article key={group.signal.kind}><div><span style={{ backgroundColor: style.color }} />Signal</div><h2>{plainSignal(group.signal, ring.couponCode)}</h2><p>{group.links.length === 1 ? `This signal connects ${group.accountIds.length} customers in this check.` : `This type of signal appears in ${group.links.length} separate links, connecting ${group.accountIds.length} customers.`}</p><div className="case-evidence-links"><b>Connections</b><p>{group.links.map((link) => describeConnection(link.accountIds)).join(" · ")}</p></div></article>; })}</section><CaseExplanation ringId={ring.id} isDemo={isDemo} initial={{ summary: ring.explanation, evidence: ring.evidence.map((item) => item.label), recommendation: ring.recommendedAction, limitations: ring.limitations, source: "deterministic" }} /></section>}
     </div>
   </main>;
 }

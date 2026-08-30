@@ -16,7 +16,8 @@ test("high-signal seeded ring is scored without restricting the offer", () => {
   assert.ok(ring.evidence.some((item) => item.kind === "payment"));
   assert.equal(ring.riskLevel, "high");
   assert.equal(ring.recommendedAction, "Keep offer available · review");
-  assert.match(ring.explanation, /not proof/i);
+  assert.match(ring.explanation, /strong promo-offer abuse pattern/i);
+  assert.match(ring.actionDetail, /Review these connected redemptions together/i);
 });
 
 test("risk decisions keep every offer available", () => {

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getCaseById, getDemoCaseById } from "@/lib/scoring";
 import type { RingCase } from "@/lib/domain";
 
-const fallback = (ring: RingCase) => ({ summary: ring.explanation, evidence: ring.evidence.map((item) => item.label), recommendation: ring.recommendedAction, limitations: ring.limitations, source: "deterministic" });
+const fallback = (ring: RingCase) => ({ summary: ring.explanation, evidence: [...new Set(ring.evidence.map((item) => item.label))], recommendation: ring.actionDetail, limitations: ring.limitations, source: "deterministic" });
 
 export async function POST(request: Request, { params }: { params: Promise<{ ringId: string }> }) {
   const { ringId } = await params;
@@ -21,9 +21,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ rin
     const response = await client.responses.create({
       model: process.env.OPENAI_EXPLANATION_MODEL ?? "gpt-5-mini",
       store: false,
-      instructions: "You are an investigator-assistance writer for a defensive fintech risk product. Use only supplied evidence. Signals estimate risk; they do not prove identity or wrongdoing. Never call customers fraudulent or guilty. Give the supplied recommended next step only. Return concise JSON matching the schema.",
-      input: JSON.stringify({ ringId: ring.id, score: ring.score, recommendedAction: ring.recommendedAction, exposureInr: ring.exposureInr, evidence: ring.evidence, limitations: ring.limitations }),
-      text: { format: { type: "json_schema", name: "investigation_explanation", strict: true, schema: { type: "object", additionalProperties: false, properties: { summary: { type: "string" }, evidence: { type: "array", items: { type: "string" } }, recommendation: { type: "string", enum: ["Keep offer available", "Keep offer available · optional verification", "Keep offer available · review"] }, limitations: { type: "array", items: { type: "string" } } }, required: ["summary", "evidence", "recommendation", "limitations"] } } },
+      instructions: "You write short case summaries for a defensive promo-offer abuse product. Use only the supplied evidence. Clearly state the connected pattern Sentinel found and why it is strong. Do not hedge with phrases such as 'may be', 'risk signal', or 'not proof'. Never call a customer fraudulent or guilty. Give exactly the supplied recommended action. Include only the supplied short caution. Remove duplicate evidence labels. Return concise JSON matching the schema.",
+      input: JSON.stringify({ ringId: ring.id, score: ring.score, recommendedAction: ring.actionDetail, exposureInr: ring.exposureInr, evidence: [...new Set(ring.evidence.map((item) => item.label))], limitations: ring.limitations }),
+      text: { format: { type: "json_schema", name: "investigation_explanation", strict: true, schema: { type: "object", additionalProperties: false, properties: { summary: { type: "string" }, evidence: { type: "array", items: { type: "string" } }, recommendation: { type: "string", enum: [ring.actionDetail] }, limitations: { type: "array", items: { type: "string" }, maxItems: 1 } }, required: ["summary", "evidence", "recommendation", "limitations"] } } },
     });
     return NextResponse.json({ ...JSON.parse(response.output_text), source: "openai" });
   } catch (error) {

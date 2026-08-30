@@ -125,7 +125,7 @@ test("returns a deterministic demo explanation when the model is unavailable", a
     const payload = await response.json() as { source?: string; summary?: string };
     assert.equal(response.status, 200);
     assert.equal(payload.source, "deterministic");
-    assert.match(payload.summary ?? "", /not proof/i);
+    assert.match(payload.summary ?? "", /strong promo-offer abuse pattern/i);
   } finally {
     restoreEnv("OPENAI_API_KEY", previousKey);
   }

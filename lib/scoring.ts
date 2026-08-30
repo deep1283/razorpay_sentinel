@@ -26,7 +26,7 @@ function timeWindowMinutes(input: Account[]) {
 }
 
 export function riskDecision(score: number): { level: RiskLevel; action: RecommendedAction; detail: string } {
-  if (score >= REVIEW_THRESHOLD) return { level: "high", action: "Keep offer available · review", detail: "Keep the offer available. Your team can review this pattern later; it is not proof of wrongdoing." };
+  if (score >= REVIEW_THRESHOLD) return { level: "high", action: "Keep offer available · review", detail: "Review these connected redemptions together before approving further promo claims from the linked accounts." };
   if (score >= 40) return { level: "medium", action: "Keep offer available · optional verification", detail: "Keep the offer available. If it fits your process, you may invite the customer to complete a simple verification." };
   return { level: "low", action: "Keep offer available", detail: "Keep the offer available and continue to watch for additional signals." };
 }
@@ -88,7 +88,7 @@ export function scoreRings(input = accounts, inputRedemptions = redemptions): Ri
     const decision = riskDecision(score >= REVIEW_THRESHOLD ? score : Math.min(score, REVIEW_THRESHOLD - 1));
     const exposureInr = couponEntries.reduce((total, item) => total + item.discountInr, 0);
     const id = presetIds[index] ?? `RNG-${String(index + 100).padStart(3, "0")}`;
-    return { id, accountIds, couponCode, exposureInr, score, confidence: score, riskLevel: decision.level, recommendedAction: decision.action, actionDetail: decision.detail, status: "investigate", evidence, createdAt: new Date().toISOString(), explanation: `${members.length} customers used ${couponCode} in a ${window}-minute window and share several details. This is a risk signal for review, not proof that the customers are the same person or did anything wrong.`, limitations: ["An IP address identifies a network, so people at a home, office, hotel, university, or mobile network can share one.", "Device details can change when someone changes browsers, clears storage, or uses another device.", "This score helps choose a next step. It is not proof of identity or wrongdoing."], members, redemptions: couponEntries };
+    return { id, accountIds, couponCode, exposureInr, score, confidence: score, riskLevel: decision.level, recommendedAction: decision.action, actionDetail: decision.detail, status: "investigate", evidence, createdAt: new Date().toISOString(), explanation: `Sentinel found a connected group of ${members.length} customers who used ${couponCode} within ${window} minutes. Their shared details form a strong promo-offer abuse pattern that should be reviewed together.`, limitations: ["A shared internet connection is weak on its own; here it is supported by stronger identity, browser, or payment signals."], members, redemptions: couponEntries };
   });
 }
 

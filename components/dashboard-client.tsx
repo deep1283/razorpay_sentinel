@@ -51,14 +51,13 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
       </header>
 
       <div className="brief-shell">
-        {sortedCases.length > 0 && <p className="brief-data-source live">Your live Razorpay Test Mode data</p>}
         <section className="brief-summary" aria-label="Promotion risk summary">
           <article className="brief-summary-main"><span>Offers to check</span><strong>₹{totalExposure.toLocaleString("en-IN")}</strong><p>in offers where we noticed unusual signup patterns</p></article>
           <article><span>Customers involved</span><strong>{accountsToReview}</strong><p>people connected by one or more signals</p></article>
         </section>
 
         <section className="brief-list-section">
-          {sortedCases.length === 0 ? <Link href="/connect" className="brief-start-tracking">Connect to Razorpay to start tracking <b>→</b></Link> : <><div className="brief-list-heading"><div><p>RISK CHECKS</p><h2>Signup patterns to review</h2></div><span>{sortedCases.length} groups found</span></div>
+          {sortedCases.length === 0 ? <Link href="/connect" className="brief-start-tracking">Connect to Razorpay to start tracking <b>→</b></Link> : <><div className="brief-list-heading"><div><p>RISK CHECKS</p><h2>Suspicious activity to review</h2></div><span>{sortedCases.length} groups found</span></div>
           <div className="brief-case-list">
             {sortedCases.map((ring) => {
               const tone = toneFor(ring);

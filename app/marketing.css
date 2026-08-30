@@ -1718,7 +1718,19 @@
 }
 
 .primer-graph-visual {
-  background: #e2ede6;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.primer-graph-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+  display: block;
 }
 
 .primer-node {
@@ -2077,38 +2089,23 @@
   right: 32px;
   height: 180px;
   border-radius: 12px;
-  background: #f6ecbe;
+  background: #ffffff;
   border: 1px solid #eddca0;
   z-index: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(163, 139, 53, 0.08);
 }
 
-.primer-network span {
-  position: absolute;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: #ffffff;
-  border: 1px solid #e5d290;
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: #273b31;
-  box-shadow: 0 6px 16px rgba(163, 139, 53, 0.12);
+.primer-network-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+  display: block;
 }
-
-.primer-network span:nth-child(1) { left: 12%; top: 18%; }
-.primer-network span:nth-child(2) { left: 48%; top: 32%; background: #fdf0ed; border-color: #f5c4b8; color: #9c3325; }
-.primer-network span:nth-child(3) { right: 10%; bottom: 18%; }
-
-.primer-network i {
-  position: absolute;
-  width: 120px;
-  height: 1px;
-  background: #a48938;
-  transform-origin: 0 0;
-}
-.primer-network i:nth-of-type(1) { left: 24%; top: 28%; width: 110px; transform: rotate(18deg); }
-.primer-network i:nth-of-type(2) { left: 56%; top: 44%; width: 100px; transform: rotate(32deg); }
-.primer-network i:nth-of-type(3) { left: 22%; top: 28%; width: 180px; transform: rotate(32deg); }
 
 .primer-rail {
   display: grid;
@@ -2337,58 +2334,171 @@
 /* Call to Action */
 .primer-cta {
   margin: 0 32px 72px;
-  padding: 80px 32px;
-  background: #15241f;
-  border-radius: 20px;
+  padding: 64px 56px;
+  background: radial-gradient(circle at 10% 20%, #2f1d52 0%, #1b1035 60%, #140b26 100%);
+  border-radius: 28px;
   color: #ffffff;
-  text-align: center;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: center;
+  text-align: left;
+  box-shadow: 0 24px 60px rgba(15, 8, 30, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.primer-cta-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.primer-cta-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #c4b5e6;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+.primer-cta-kicker .kicker-dash {
+  display: inline-block;
+  width: 18px;
+  height: 2px;
+  background: #c4b5e6;
+  border-radius: 1px;
 }
 
 .primer-cta h2 {
-  max-width: 720px;
-  margin: 16px auto;
-  color: #ffffff;
-  font-size: clamp(36px, 4.5vw, 60px);
-}
-
-.primer-cta > p:not(.primer-kicker) {
-  max-width: 520px;
-  margin: 0 auto 28px;
-  color: #b5ccc1;
-  font-family: 'Inter', sans-serif;
-  font-size: 15.5px;
-  line-height: 1.65;
-}
-
-.primer-cta > a {
-  display: inline-flex;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 28px;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #12211c;
-  text-decoration: none;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14px;
+  margin: 0 0 16px;
+  color: #ffffff !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(32px, 3.6vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
   font-weight: 800;
+  max-width: 540px;
+}
+
+.primer-cta-desc {
+  color: #b8aed2;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 28px;
+  max-width: 480px;
+}
+
+.primer-cta-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
   letter-spacing: -0.01em;
-  transition: all 0.2s ease;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.primer-cta > a:hover {
-  background: #eef6f1;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+.primer-cta-action:hover {
+  opacity: 0.85;
 }
 
-.primer-cta > a b {
+.primer-cta-action b {
   font-size: 16px;
   transition: transform 0.2s ease;
 }
 
-.primer-cta > a:hover b {
-  transform: translateX(3px);
+.primer-cta-action:hover b {
+  transform: translateX(4px);
+}
+
+.primer-cta-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 210px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.primer-cta-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.primer-cta-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.primer-cta-card-header span {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #a594c9;
+  text-transform: uppercase;
+}
+
+.primer-cta-arrow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #1e123a;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.primer-cta-arrow-btn:hover {
+  transform: scale(1.08) translate(1px, -1px);
+  background: #f3f0fc;
+}
+
+.primer-cta-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.primer-cta-email {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 800;
+  color: #ffffff;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  word-break: break-all;
+  transition: color 0.2s ease;
+}
+
+.primer-cta-email:hover {
+  color: #d8cefa;
+}
+
+.primer-cta-subtext {
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  color: #a594c9;
+  margin: 0;
 }
 
 /* Footer */
@@ -2485,7 +2595,7 @@
   .primer-product-card { min-height: 350px; }
   .primer-rail { grid-template-columns: 1fr 1fr; }
   .primer-connections { margin: 0 16px 72px; padding: 40px 24px; }
-  .primer-cta { margin: 0 16px 56px; }
+  .primer-cta { grid-template-columns: 1fr; padding: 48px 24px; gap: 36px; margin: 0 16px 56px; }
   .primer-footer { grid-template-columns: 1fr 1fr; padding: 48px 24px 28px; }
   .primer-footer-brand { grid-column: 1 / -1; }
 }
@@ -2497,7 +2607,8 @@
   .primer-product-card { padding: 24px; }
   .primer-rail { grid-template-columns: 1fr; }
   .primer-story { min-height: 440px; padding: 24px; }
-  .primer-cta { padding: 56px 20px; }
+  .primer-cta { padding: 36px 18px; border-radius: 20px; }
+  .primer-cta-card { padding: 24px 18px; min-height: auto; }
   .primer-footer { grid-template-columns: 1fr; gap: 28px; }
   .primer-footer-brand { grid-column: auto; }
 }

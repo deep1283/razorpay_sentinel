@@ -40,7 +40,16 @@ const journeys = [
 
 function SignalVisual({ type }: { type: string }) {
   if (type === "graph") {
-    return <div className="primer-graph-visual" aria-hidden="true"><span className="primer-node p-node-a">u_891</span><span className="primer-node p-node-b">device</span><span className="primer-node p-node-c">visa · 4911</span><span className="primer-node p-node-d">u_442</span><i className="p-edge e-one" /><i className="p-edge e-two" /><i className="p-edge e-three" /><div className="primer-risk-chip">Shared payment instrument <b>94</b></div></div>;
+    return (
+      <div className="primer-graph-visual" aria-hidden="true">
+        <img
+          src="/sentinel-home.png"
+          alt="Sentinel ring evidence graph"
+          className="primer-graph-image"
+        />
+        <div className="primer-risk-chip">Shared promo ring <b>94</b></div>
+      </div>
+    );
   }
   if (type === "campaign") {
     return <div className="primer-campaign-visual" aria-hidden="true"><div className="primer-ticket"><span>WELCOME50</span><b>50% OFF</b><small>Promotion velocity monitored</small></div><div className="primer-campaign-bars"><i /><i /><i /><i className="hot" /><i className="hot" /><i className="hot" /></div><div className="primer-alert-pill">Unusual redemption pattern</div></div>;
@@ -115,7 +124,18 @@ export function CommerceShowcase() {
         <div className="primer-products-heading"><h2>One calm workspace for the signals that matter.</h2><p>From the first suspicious redemption to a review-ready case, Sentinel keeps every thread connected.</p></div>
         <div className="primer-product-grid">
           <article className="primer-product-card primer-product-coral"><div className="primer-card-ui"><span>PAYMENT EVENT</span><b>order.paid</b><i>→</i></div><h3>Catch repeat abuse in real time</h3><p>Passive webhook ingestion, normalized in moments.</p><Link href="/dashboard">View signals <b>→</b></Link></article>
-          <article className="primer-product-card primer-product-yellow"><div className="primer-network"><span>u_148</span><span>card</span><span>u_219</span><i /><i /><i /></div><h3>Follow the shared thread</h3><p>Devices, cards, addresses, and identities become one graph.</p><Link href="/dashboard">Open graph <b>→</b></Link></article>
+          <article className="primer-product-card primer-product-yellow">
+            <div className="primer-network">
+              <img
+                src="/sentinel-home.png"
+                alt="Shared thread evidence ring"
+                className="primer-network-img"
+              />
+            </div>
+            <h3>Follow the shared thread</h3>
+            <p>Devices, cards, addresses, and identities become one graph.</p>
+            <Link href="/dashboard">Open graph <b>→</b></Link>
+          </article>
         </div>
         <div className="primer-rail">
           {["Token intelligence", "Address matching", "Device fingerprints", "Promotion velocity"].map((name, index) => <div key={name}><span className={`primer-rail-icon icon-${index}`}>✦</span><p>{name}</p><b>→</b></div>)}
@@ -132,7 +152,29 @@ export function CommerceShowcase() {
         <div className="primer-story-grid"><article className="primer-story lavender"><div className="primer-story-chart"><span>RING RISK</span><i /><i /><i /><i /><i /><strong>94</strong></div><h3>Every conclusion is traceable</h3><p>Review the exact signals that connected an account to a suspicious cluster.</p><Link href="/dashboard">See case evidence <b>→</b></Link></article><article className="primer-story mint"><div className="primer-story-list"><span>CASE QUEUE</span><p><i /> Token reused <b>high</b></p><p><i /> Address overlap <b>medium</b></p><p><i /> Device cluster <b>high</b></p></div><h3>Keep people in control</h3><p>Sentinel surfaces the work; your team decides what happens next.</p><Link href="/login">Talk to the team <b>→</b></Link></article></div>
       </section>
 
-      <section className="primer-cta" id="contact"><p className="primer-kicker">READY WHEN YOU ARE</p><h2>Make every promotion harder to exploit.</h2><p>Bring your first webhook event, and we’ll help you find the hidden connections.</p><Link href="/login">Request a demo <b>→</b></Link></section>
+      <section className="primer-cta" id="contact">
+        <div className="primer-cta-content">
+          <p className="primer-cta-kicker"><span className="kicker-dash" />CONTACT</p>
+          <h2>Make every promotion harder to exploit.</h2>
+          <p className="primer-cta-desc">Bring your first webhook event, and we’ll help you find the hidden connections.</p>
+          <Link href="/login" className="primer-cta-action">Get started <b>→</b></Link>
+        </div>
+        <div className="primer-cta-card">
+          <div className="primer-cta-card-header">
+            <span>EMAIL</span>
+            <a href="mailto:deepmishra1283@gmail.com" className="primer-cta-arrow-btn" aria-label="Send email to deepmishra1283@gmail.com">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </a>
+          </div>
+          <div className="primer-cta-card-body">
+            <a href="mailto:deepmishra1283@gmail.com" className="primer-cta-email">deepmishra1283@gmail.com</a>
+            <p className="primer-cta-subtext">Send a message to the Sentinel team</p>
+          </div>
+        </div>
+      </section>
       <footer className="primer-footer"><div className="primer-footer-brand"><b>◈ Sentinel</b><p>Fraud intelligence for the teams that keep commerce moving.</p></div><div><b>Product</b><a href="#features">Capabilities</a><Link href="/dashboard">Live workspace</Link><Link href="/login">Sign in</Link></div><div><b>Resources</b><a href="#safety">Evidence trails</a><a href="#contact">Talk to us</a><a href="#features">How it works</a></div><div><b>Stay in the loop</b><p>Product notes and safer-growth ideas, occasionally.</p><Link className="primer-footer-button" href="/login">Get access →</Link></div><small>© {new Date().getFullYear()} Sentinel Intelligence · Built for Razorpay merchants</small></footer>
     </>
   );

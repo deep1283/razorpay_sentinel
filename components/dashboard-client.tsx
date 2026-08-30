@@ -18,9 +18,10 @@ function plainReason(ring: RingCase) {
   return `We noticed ${signals.join(" and ")} across these signups.`;
 }
 
-export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
+export function DashboardClient({ initial, initialError }: { initial: DashboardSnapshot | null; initialError?: string }) {
   const [data, setData] = useState(initial);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(initialError ?? "");
 
   useEffect(() => {
     const client = createBrowserSupabaseClient();
@@ -33,15 +34,20 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
 
   async function refreshDashboard() {
     setRefreshing(true);
+    setError("");
     try {
       const response = await fetch("/api/dashboard");
-      if (response.ok) setData(await response.json());
+      const payload = await response.json() as DashboardSnapshot | { error?: string };
+      if (!response.ok || !("cases" in payload)) throw new Error("error" in payload ? payload.error : "The dashboard could not be refreshed.");
+      setData(payload);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "The dashboard could not be refreshed.");
     } finally {
       setRefreshing(false);
     }
   }
 
-  const sortedCases = [...data.cases].sort((a, b) => b.score - a.score);
+  const sortedCases = [...(data?.cases ?? [])].sort((a, b) => b.score - a.score);
   const totalExposure = sortedCases.reduce((sum, ring) => sum + ring.exposureInr, 0);
   const accountsToReview = new Set(sortedCases.flatMap((ring) => ring.accountIds)).size;
 
@@ -52,6 +58,7 @@ export function DashboardClient({ initial }: { initial: DashboardSnapshot }) {
       </header>
 
       <div className="brief-shell">
+        {error && <div className="brief-error" role="alert"><span>{error}</span><button type="button" onClick={refreshDashboard} disabled={refreshing}>{refreshing ? "Retrying…" : "Try again"}</button></div>}
         <section className="brief-summary" aria-label="Promotion risk summary">
           <article className="brief-summary-main"><span>Offers to check</span><strong>₹{totalExposure.toLocaleString("en-IN")}</strong><p>in offers where we noticed unusual signup patterns</p></article>
           <article><span>Customers involved</span><strong>{accountsToReview}</strong><p>people connected by one or more signals</p></article>

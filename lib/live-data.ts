@@ -23,7 +23,9 @@ export async function loadLiveCheckoutData(): Promise<{ configured: boolean; acc
     client.from("raw_events").select("event_type,payload").in("event_type", ["order.paid", "payment.captured"]),
     client.from("checkout_signals").select("merchant_order_id,account_id,created_at,device_hash,payment_token_hash,address_hash,ip_hash,coupon_code,discount_inr"),
   ]);
-  if (eventsResult.error || signalsResult.error) return { configured: false, accounts: [], redemptions: [] };
+  if (eventsResult.error || signalsResult.error) {
+    throw new Error("Sentinel could not load the latest payment signals.");
+  }
 
   const paidOrderIds = new Set((eventsResult.data as RawEventRow[]).map((event) => razorpayOrderId(event.payload)).filter((id): id is string => Boolean(id)));
   const matchedSignals = (signalsResult.data as CheckoutSignalRow[]).filter((signal) => paidOrderIds.has(signal.merchant_order_id));

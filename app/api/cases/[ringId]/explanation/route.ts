@@ -7,7 +7,12 @@ const fallback = (ring: RingCase) => ({ summary: ring.explanation, evidence: rin
 
 export async function POST(_: Request, { params }: { params: Promise<{ ringId: string }> }) {
   const { ringId } = await params;
-  const ring = await getCaseById(ringId);
+  let ring: RingCase | undefined;
+  try {
+    ring = await getCaseById(ringId);
+  } catch {
+    return NextResponse.json({ error: "Case data is temporarily unavailable. Please try again." }, { status: 503 });
+  }
   if (!ring) return NextResponse.json({ error: "Case not found" }, { status: 404 });
   if (!process.env.OPENAI_API_KEY) return NextResponse.json(fallback(ring));
   try {

@@ -63,6 +63,15 @@ input {
   font: inherit;
 }
 
+.app-error-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.app-error-page section { width: min(100%, 540px); padding: 40px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+.app-error-page p { margin: 0 0 8px; color: var(--red); font: 700 12px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.app-error-page h1 { margin: 0 0 12px; font-size: 28px; }
+.app-error-page span { color: #607078; line-height: 1.5; }
+.app-error-page div { display: flex; gap: 12px; margin-top: 24px; }
+.app-error-page button, .app-error-page a { border: 0; border-radius: 8px; padding: 10px 14px; background: var(--navy); color: #fff; font-weight: 700; text-decoration: none; cursor: pointer; }
+.app-error-page a { background: #e9eeed; color: var(--navy); }
+
 .icon {
   width: 18px;
   height: 18px;

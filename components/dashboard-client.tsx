@@ -69,7 +69,7 @@ export function DashboardClient({ initial, initialError, isDemo = false }: { ini
         </section>
 
         <section className="brief-list-section">
-          {sortedCases.length === 0 ? <section className="brief-empty-cta"><p>NO ACTIVITY YET</p><h2>Make a demo payment to see Sentinel work.</h2><span>Razorpay will send the payment update and Sentinel will show the result here.</span><Link href="/test-checkout">Make a ₹100 demo payment <b>→</b></Link></section> : <><div className="brief-list-heading"><div><p>RISK CHECKS</p><h2>Suspicious activity to review</h2></div><span>{sortedCases.length} groups found</span></div>
+          {sortedCases.length === 0 ? <section className="brief-empty-cta"><p>NO ACTIVITY YET</p><h2>Make a demo payment to see Sentinel work.</h2><span>Razorpay will send the payment update and Sentinel will show the result here.</span><Link href="/test-checkout" target="_blank" rel="noreferrer">Make a ₹100 demo payment <b>↗</b></Link></section> : <><div className="brief-list-heading"><div><p>RISK CHECKS</p><h2>Suspicious activity to review</h2></div><span>{sortedCases.length} groups found</span></div>
           <div className="brief-case-list">
             {sortedCases.map((ring) => {
               const tone = toneFor(ring);

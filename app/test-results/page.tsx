@@ -104,7 +104,7 @@ export default function TestResultsPage() {
         <Link href="/test-methodology">Know more <b>→</b></Link>
       </section>
 
-      <footer className="test-results-footer"><div><b>See the detector working on a connected ring.</b><span>Explore a 12-customer pattern where each customer shares only some of the signals.</span></div><Link href="/dashboard?guest=1&demo=1">Open visual demo <b>→</b></Link></footer>
+      <footer className="test-results-footer"><div><b>See the detector working on a connected ring.</b><span>Explore a 12-customer pattern where each customer shares only some of the signals.</span></div><Link href="/dashboard?guest=1&demo=1" target="_blank" rel="noopener noreferrer">Open visual demo <b>→</b></Link></footer>
     </div>
   </main>;
 }

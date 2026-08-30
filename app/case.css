@@ -494,14 +494,6 @@
   margin-bottom: 22px;
 }
 
-.case-reasons-intro {
-  margin: -8px 0 22px;
-  color: #69736d;
-  font-family: 'Inter', sans-serif;
-  font-size: 12.5px;
-  line-height: 1.6;
-}
-
 .case-reasons-bullets {
   list-style: none;
   margin: 0;
@@ -533,7 +525,6 @@
 
 .case-ring-panel {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 24px;
@@ -562,10 +553,9 @@
   stroke-dasharray: 3 7;
 }
 
-.circle-evidence-line {
-  stroke-width: 3;
-  stroke-linecap: round;
-  opacity: 0.68;
+.circle-member-line {
+  stroke: #d7dcd7;
+  stroke-width: 1.5;
 }
 
 .circle-account,
@@ -634,32 +624,6 @@
 .circle-center small {
   font-family: 'Inter', sans-serif;
   font-size: 10.5px;
-}
-
-.circle-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 12px;
-  width: min(520px, 100%);
-  margin-top: 14px;
-}
-
-.circle-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #667069;
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.circle-legend i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
 }
 
 .case-evidence-links {

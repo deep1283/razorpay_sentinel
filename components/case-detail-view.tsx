@@ -64,7 +64,6 @@ export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDem
     }));
   }, [ring.evidence]);
   const memberPoints = useMemo(() => new Map(members.map((member, index) => [member.id, pointOnCircle(index, members.length, 260)])), [members]);
-  const graphLinks = useMemo(() => signalGroups.filter((group) => group.signal.kind !== "timing").flatMap((group) => group.links.flatMap((link, linkIndex) => link.accountIds.slice(1).map((accountId) => ({ key: `${group.signal.kind}-${linkIndex}-${accountId}`, kind: group.signal.kind, from: link.accountIds[0], to: accountId })))), [signalGroups]);
   const exposureByAccount = useMemo(() => new Map((ring.redemptions ?? redemptions).filter((item) => ring.accountIds.includes(item.accountId)).map((item) => [item.accountId, item])), [ring.accountIds, ring.redemptions]);
 
   return <main className="case-page">
@@ -77,21 +76,19 @@ export function CaseDetailView({ ring, isDemo = false }: { ring: RingCase; isDem
       {activeTab === "graph" && <section className="case-graph-card case-split-view">
         <div className="case-reasons-panel">
           <span className="case-reasons-label">Detected patterns</span>
-          <p className="case-reasons-intro">All {members.length} customers are linked through separate shared details. Follow the coloured lines to see each connection.</p>
           <ul className="case-reasons-bullets">
             {signalGroups.map((group) => <li key={group.signal.kind}>{plainSignal(group.signal, ring.couponCode)}</li>)}
           </ul>
         </div>
         <div className="case-ring-panel">
-          <div className="circle-graph" role="img" aria-label={`Connection map for case ${ring.id}, with ${members.length} accounts and ${graphLinks.length} direct shared-detail links`}>
+          <div className="circle-graph" role="img" aria-label={`Circular evidence map for case ${ring.id}, with ${members.length} accounts and ${signalGroups.length} types of shared signal`}>
             <svg viewBox="0 0 700 700" aria-hidden="true">
               <circle cx="350" cy="350" r="260" className="circle-guide outer" />
-              {graphLinks.map((link) => { const from = memberPoints.get(link.from); const to = memberPoints.get(link.to); if (!from || !to) return null; return <line key={link.key} x1={from.x} y1={from.y} x2={to.x} y2={to.y} className="circle-evidence-line" style={{ stroke: styles[link.kind].color }} />; })}
+              {members.map((member) => { const point = memberPoints.get(member.id)!; return <line key={member.id} x1="350" y1="350" x2={point.x} y2={point.y} className="circle-member-line" />; })}
             </svg>
             {members.map((member) => { const point = memberPoints.get(member.id)!; return <div className="circle-account" key={member.id} style={{ left: `${(point.x / 700) * 100}%`, top: `${(point.y / 700) * 100}%` }}><span>Customer</span><b>{member.id}</b></div>; })}
             <div className="circle-center"><span>OFFER</span><b>{ring.couponCode}</b><small>{members.length} customers</small></div>
           </div>
-          <div className="circle-legend" aria-label="Connection line colours">{signalGroups.filter((group) => group.signal.kind !== "timing").map((group) => <span key={group.signal.kind}><i style={{ backgroundColor: styles[group.signal.kind].color }} />{styles[group.signal.kind].label}</span>)}</div>
         </div>
       </section>}
 

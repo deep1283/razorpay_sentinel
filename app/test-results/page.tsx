@@ -52,33 +52,56 @@ export default function TestResultsPage() {
 
       <section className="test-evidence-grid">
         <div className="test-confusion-card">
-          <div className="test-section-heading"><p>THE COMPLETE PICTURE</p><h2>Every final-test result, accounted for</h2></div>
-          <div className="confusion-matrix" role="table" aria-label="Held-out test confusion matrix">
-            <div className="matrix-corner" />
-            <div role="columnheader">Sent to review</div><div role="columnheader">Not sent</div>
-            <div role="rowheader">Abuse pattern <small>{actualAbuse} cases</small></div>
-            <div className="matrix-cell correct" role="cell"><strong>{metrics.truePositives}</strong><span>correct reviews</span></div>
-            <div className="matrix-cell missed" role="cell"><strong>{metrics.falseNegatives}</strong><span>not found</span></div>
-            <div role="rowheader">Legitimate activity <small>{actualLegitimate} cases</small></div>
-            <div className="matrix-cell false" role="cell"><strong>{metrics.falsePositives}</strong><span>unnecessary reviews</span></div>
-            <div className="matrix-cell correct" role="cell"><strong>{metrics.trueNegatives}</strong><span>correctly cleared</span></div>
+          <div className="test-section-heading">
+            <p>PERFORMANCE BREAKDOWN</p>
+            <h2>How Sentinel performed across all 100 test cases</h2>
+          </div>
+
+          <div className="test-breakdown-list">
+            <div className="test-breakdown-row">
+              <div className="test-breakdown-header">
+                <div>
+                  <span className="test-breakdown-tag abuse">Promo Abuse Rings</span>
+                  <h3>50 of 50 caught</h3>
+                </div>
+                <strong className="test-breakdown-pct">100%</strong>
+              </div>
+              <div className="test-progress-bar">
+                <div className="test-progress-fill full" style={{ width: "100%" }} />
+              </div>
+              <p>Every single coordinated promo exploit was caught and flagged for review. Zero abuse slipped through.</p>
+            </div>
+
+            <div className="test-breakdown-row">
+              <div className="test-breakdown-header">
+                <div>
+                  <span className="test-breakdown-tag legitimate">Normal Customers</span>
+                  <h3>46 of 50 cleared automatically</h3>
+                </div>
+                <strong className="test-breakdown-pct">92%</strong>
+              </div>
+              <div className="test-progress-bar split">
+                <div className="test-progress-fill cleared" style={{ width: "92%" }} />
+                <div className="test-progress-fill reviewed" style={{ width: "8%" }} />
+              </div>
+              <p>46 genuine shoppers completed checkout with zero friction. Only 4 borderline cases were sent for quick verification.</p>
+            </div>
           </div>
         </div>
 
         <aside className="test-cost-card">
-          <p>COST OF UNNECESSARY REVIEWS</p><strong>₹{metrics.falsePositiveReviewCostInr.toLocaleString("en-IN")}</strong><span>{metrics.falsePositives} legitimate cases reviewed × ₹150 estimated staff cost</span><hr />
-          <p>WHY IT MATTERS</p><span>A strong detector catches real issues without wasting the merchant team’s time.</span>
+          <p>COST OF UNNECESSARY REVIEWS</p>
+          <strong>₹{metrics.falsePositiveReviewCostInr.toLocaleString("en-IN")}</strong>
+          <span>{metrics.falsePositives} legitimate cases reviewed × ₹150 estimated staff cost</span>
+          <hr />
+          <p>WHY IT MATTERS</p>
+          <span>A strong detector catches real issues without wasting the merchant team’s time.</span>
         </aside>
       </section>
 
-      <section className="test-method">
-        <div className="test-section-heading"><p>WHY THIS TEST IS FAIR</p><h2>The final test used the same kind of data, not the same examples.</h2></div>
-        <div className="test-method-grid">
-          <article><span>50 / 50</span><h3>Balanced test</h3><p>Half of the final examples show coordinated abuse. The other half show normal customer activity.</p></article>
-          <article><span>NO OVERLAP</span><h3>Different customers</h3><p>Practice and final-test data never share customer, browser, payment, identity, address, network, or referral fingerprints.</p></article>
-          <article><span>REAL EDGE CASES</span><h3>Normal sharing included</h3><p>Families, offices, shared devices, company cards, referrals, and fast legitimate activity are all included.</p></article>
-          <article><span>REPRODUCIBLE</span><h3>Anyone can rerun it</h3><p>The scenario generator and its fixed seeds are committed with the project.</p></article>
-        </div>
+      <section className="test-know-more" aria-label="Test methodology">
+        <div><p>WANT THE DETAILS?</p><h2>See what was tested and how we kept the result fair.</h2></div>
+        <Link href="/test-methodology">Know more <b>→</b></Link>
       </section>
 
       <footer className="test-results-footer"><div><b>See the detector working on a connected ring.</b><span>Explore a 12-customer pattern where each customer shares only some of the signals.</span></div><Link href="/dashboard?guest=1&demo=1">Open visual demo <b>→</b></Link></footer>

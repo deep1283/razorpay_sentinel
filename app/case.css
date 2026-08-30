@@ -136,8 +136,8 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  align-items: flex-end;
-  padding: 24px 28px 20px;
+  align-items: center;
+  padding: 24px 32px 20px;
   border-bottom: 1px solid #ecece7;
 }
 
@@ -145,16 +145,16 @@
 .case-data-heading h2 {
   margin: 0;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #1a241f;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #16201b;
 }
 
 .case-graph-heading p,
 .case-data-heading p {
-  margin: 5px 0 0;
-  color: #6a746e;
+  margin: 0;
+  color: #68736d;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   line-height: 1.5;
@@ -341,46 +341,55 @@
 }
 
 .case-data-card th {
-  padding: 14px 24px;
+  padding: 14px 32px;
   background: #fafbf9;
-  color: #6e7771;
-  font-family: 'DM Mono', monospace;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  color: #6a746e;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .case-data-card td {
-  padding: 18px 24px;
+  padding: 18px 32px;
   border-top: 1px solid #ecece7;
-  color: #454e48;
+  color: #3e4842;
   font-family: 'Inter', sans-serif;
   font-size: 13.5px;
 }
 
-.case-data-card td > b {
-  color: #1f2723;
+.case-customer-id {
   font-family: 'DM Mono', monospace;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
+  color: #242d27;
 }
 
-.case-data-card code {
-  padding: 3px 6px;
-  border-radius: 4px;
-  background: #f0f5f2;
-  color: #38624e;
+.case-offer-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.case-coupon-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #f0f4f1;
+  border: 1px solid #dce4df;
+  color: #233028;
   font-family: 'DM Mono', monospace;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-.case-data-card small {
-  margin-left: 5px;
-  color: #737c76;
+.case-coupon-amount {
+  color: #55625a;
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .case-evidence-grid {
@@ -456,11 +465,76 @@
   margin-right: 4px;
 }
 
+.case-split-view {
+  display: grid;
+  grid-template-columns: 390px 1fr;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e2e3dc;
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 560px;
+}
+
+.case-reasons-panel {
+  padding: 44px 36px 44px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.case-reasons-label {
+  display: block;
+  color: #6a746e;
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+.case-reasons-bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.case-reasons-bullets li {
+  position: relative;
+  padding-left: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #2f3832;
+}
+
+.case-reasons-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d95842;
+}
+
+.case-ring-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
 .circle-graph {
   position: relative;
-  width: min(700px, 100%);
+  width: min(520px, 100%);
   aspect-ratio: 1;
-  margin: 14px auto 10px;
+  margin: 0 auto;
   background: radial-gradient(circle at center, #f6f0ff 0 13%, transparent 13.3% 36%, #fbfbf8 36.3% 36.6%, transparent 36.9%);
 }
 
@@ -552,21 +626,19 @@
   font-size: 10.5px;
 }
 
-.case-proof-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 22px;
-  margin: 0;
-  padding: 20px 28px 18px 46px;
-  border-bottom: 1px solid #ecece7;
-  color: #535d57;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.case-proof-list li {
-  padding-left: 1px;
+@media (max-width: 960px) {
+  .case-split-view {
+    grid-template-columns: 1fr;
+  }
+  .case-reasons-panel {
+    padding: 32px 24px 10px;
+  }
+  .case-ring-panel {
+    padding: 10px 16px 32px;
+  }
+  .circle-graph {
+    width: min(480px, 100%);
+  }
 }
 
 .explanation-error {

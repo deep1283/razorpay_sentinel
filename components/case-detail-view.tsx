@@ -53,19 +53,26 @@ export function CaseDetailView({ ring }: { ring: RingCase }) {
         {(["graph", "accounts", "evidence"] as Tab[]).map((tab) => <button key={tab} type="button" className={activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)}>{tab === "graph" ? "Overview" : tab === "accounts" ? `Customers (${members.length})` : "What we noticed"}</button>)}
       </nav>
 
-      {activeTab === "graph" && <section className="case-graph-card">
-        <ul className="case-proof-list">{signals.map((signal, index) => <li key={`${signal.kind}-${index}`}>{plainSignal(signal, ring.couponCode)}</li>)}</ul>
-        <div className="circle-graph" role="img" aria-label={`Circular evidence map for case ${ring.id}, with ${members.length} accounts and ${signals.length} shared signals`}>
-          <svg viewBox="0 0 700 700" aria-hidden="true">
-            <circle cx="350" cy="350" r="260" className="circle-guide outer" />
-            {members.map((member, index) => { const point = pointOnCircle(index, members.length, 260); return <line key={member.id} x1="350" y1="350" x2={point.x} y2={point.y} className="circle-member-line" />; })}
-          </svg>
-          {members.map((member, index) => { const point = pointOnCircle(index, members.length, 260); return <div className="circle-account" key={member.id} style={{ left: `${(point.x / 700) * 100}%`, top: `${(point.y / 700) * 100}%` }}><span>Customer</span><b>{member.id}</b></div>; })}
-          <div className="circle-center"><span>OFFER</span><b>{ring.couponCode}</b><small>{members.length} customers</small></div>
+      {activeTab === "graph" && <section className="case-graph-card case-split-view">
+        <div className="case-reasons-panel">
+          <span className="case-reasons-label">Detected patterns</span>
+          <ul className="case-reasons-bullets">
+            {signals.map((signal, index) => <li key={`${signal.kind}-${index}`}>{plainSignal(signal, ring.couponCode)}</li>)}
+          </ul>
+        </div>
+        <div className="case-ring-panel">
+          <div className="circle-graph" role="img" aria-label={`Circular evidence map for case ${ring.id}, with ${members.length} accounts and ${signals.length} shared signals`}>
+            <svg viewBox="0 0 700 700" aria-hidden="true">
+              <circle cx="350" cy="350" r="260" className="circle-guide outer" />
+              {members.map((member, index) => { const point = pointOnCircle(index, members.length, 260); return <line key={member.id} x1="350" y1="350" x2={point.x} y2={point.y} className="circle-member-line" />; })}
+            </svg>
+            {members.map((member, index) => { const point = pointOnCircle(index, members.length, 260); return <div className="circle-account" key={member.id} style={{ left: `${(point.x / 700) * 100}%`, top: `${(point.y / 700) * 100}%` }}><span>Customer</span><b>{member.id}</b></div>; })}
+            <div className="circle-center"><span>OFFER</span><b>{ring.couponCode}</b><small>{members.length} customers</small></div>
+          </div>
         </div>
       </section>}
 
-      {activeTab === "accounts" && <section className="case-data-card"><div className="case-data-heading"><h2>Customers in this check</h2><p>These customers used the same offer. They may still be separate people.</p></div><div className="case-table-scroll"><table><thead><tr><th>Customer</th><th>Joined</th><th>Offer used</th></tr></thead><tbody>{members.map((member) => { const redemption = exposureByAccount.get(member.id); return <tr key={member.id}><td><b>{member.id}</b></td><td>{formatDate(member.createdAt)}</td><td>{redemption ? <><b>{redemption.code}</b><small> ₹{redemption.discountInr.toLocaleString("en-IN")}</small></> : "—"}</td></tr>; })}</tbody></table></div></section>}
+      {activeTab === "accounts" && <section className="case-data-card"><div className="case-data-heading"><h2>Customers in this check</h2><p>These customers used the same offer. They may still be separate people.</p></div><div className="case-table-scroll"><table><thead><tr><th>Customer</th><th>Joined</th><th>Offer used</th></tr></thead><tbody>{members.map((member) => { const redemption = exposureByAccount.get(member.id); return <tr key={member.id}><td><span className="case-customer-id">{member.id}</span></td><td>{formatDate(member.createdAt)}</td><td>{redemption ? <div className="case-offer-cell"><span className="case-coupon-badge">{redemption.code}</span><span className="case-coupon-amount">₹{redemption.discountInr.toLocaleString("en-IN")}</span></div> : "—"}</td></tr>; })}</tbody></table></div></section>}
 
       {activeTab === "evidence" && <section className="case-evidence-grid">{signals.map((signal, index) => { const style = styles[signal.kind]; return <article key={`${signal.kind}-${index}`}><div><span style={{ backgroundColor: style.color }} />Signal</div><h2>{plainSignal(signal, ring.couponCode)}</h2><p>This appears across all {signal.accountIds.length} customers in this check.</p></article>; })}</section>}
     </div>

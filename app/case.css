@@ -726,13 +726,11 @@
   font-weight: 700;
 }
 
-.recommendation,
 .limitations {
   padding-top: 15px;
   border-top: 1px solid #ded5e8;
 }
 
-.recommendation b,
 .limitations b {
   display: block;
   margin-bottom: 7px;
@@ -743,14 +741,8 @@
   text-transform: uppercase;
 }
 
-.recommendation strong {
-  color: #28332d;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px;
-}
-
 .limitations {
-  margin-top: 15px;
+  margin-top: 18px;
 }
 
 .limitations ul {

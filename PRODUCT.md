@@ -94,6 +94,8 @@ Current untouched held-out synthetic Test Mode result: **50 true positives, 4 fa
 
 The important limitation is that these metrics are from labelled synthetic scenarios, not production merchant traffic. They are an honest, reproducible benchmark for the submission; real deployment needs merchant-labelled outcomes and a fresh held-out evaluation.
 
+The dashboard navigation includes a **Test** page at `/test-results`, where reviewers can see the complete evaluation visually instead of reading the compact dashboard summary.
+
 ## What a reviewer should notice
 
 - **Real integration path:** Razorpay Test Mode orders and signed webhooks.

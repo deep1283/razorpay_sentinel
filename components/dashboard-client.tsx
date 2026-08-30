@@ -55,6 +55,10 @@ export function DashboardClient({ initial, initialError, isDemo = false }: { ini
     <main className="brief-dashboard">
       <header className="brief-topbar">
         <Link href="/" className="brief-brand flex items-center gap-2"><SentinelLogo size={22} className="rounded-md" /> Sentinel</Link>
+        <nav className="brief-nav" aria-label="Workspace navigation">
+          <Link href={`/dashboard?guest=1${isDemo ? "&demo=1" : ""}`} className="active" aria-current="page">Dashboard</Link>
+          <Link href="/test-results">Test</Link>
+        </nav>
       </header>
 
       <div className="brief-shell">

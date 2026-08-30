@@ -85,6 +85,8 @@ The untouched held-out evaluator currently reports **50 true positives, 4 false 
 
 For the stronger visual demo, open `/dashboard?demo=1` and select the 12-customer transitive ring. Each customer shares only one or two signals with a neighbour; the graph connects the whole pattern without requiring every account to share every signal.
 
+Open `/test-results` for the reviewer-friendly evaluation report: development-to-test flow, locked threshold, confusion matrix, plain-English metric definitions, and false-positive review cost.
+
 ## Razorpay webhook setup
 
 Use Test Mode. Configure `https://your-domain/api/webhooks/razorpay` and subscribe to `order.paid` and/or `payment.captured`. Store the webhook secret only in `RAZORPAY_WEBHOOK_SECRET`. The handler validates `x-razorpay-signature`, stores each event once by its event ID, returns a fast acknowledgement, and does not invoke any money-action API.

@@ -63,8 +63,6 @@ export function CaseDetailView({ ring }: { ring: RingCase }) {
       {activeTab === "accounts" && <section className="case-data-card"><div className="case-data-heading"><h2>Customers in this check</h2><p>These customers used the same offer. They may still be separate people.</p></div><div className="case-table-scroll"><table><thead><tr><th>Customer</th><th>Joined</th><th>Offer used</th></tr></thead><tbody>{members.map((member) => { const redemption = exposureByAccount.get(member.id); return <tr key={member.id}><td><b>{member.id}</b></td><td>{formatDate(member.createdAt)}</td><td>{redemption ? <><b>{redemption.code}</b><small> ₹{redemption.discountInr.toLocaleString("en-IN")}</small></> : "—"}</td></tr>; })}</tbody></table></div></section>}
 
       {activeTab === "evidence" && <section className="case-evidence-grid">{signals.map((signal, index) => { const style = styles[signal.kind]; return <article key={`${signal.kind}-${index}`}><div><span style={{ backgroundColor: style.color }} />Signal</div><h2>{plainSignal(signal, ring.couponCode)}</h2><p>This appears across all {signal.accountIds.length} customers in this check.</p></article>; })}</section>}
-
-      <aside className="case-caution"><b>Important:</b> Signals help estimate risk. They do not prove who a person is or that anyone did anything wrong.</aside>
     </div>
   </main>;
 }

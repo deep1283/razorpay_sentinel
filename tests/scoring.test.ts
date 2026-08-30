@@ -45,3 +45,13 @@ test("a shared payment method can create a review without a shared device, while
   const networkOnly = [base("N-1", "payment-1", "ip-shared"), base("N-2", "payment-2", "ip-shared"), base("N-3", "payment-3", "ip-shared")];
   assert.equal(scoreRings(networkOnly, []).length, 0);
 });
+
+test("shared hashed email is strong evidence, while a shared referral alone is not", () => {
+  const base = (id: string): Account => ({ id, createdAt: `2026-08-29T11:0${id.slice(-1)}:00Z`, deviceHash: `browser-${id}`, paymentTokenHash: `payment-${id}`, addressHash: `address-${id}`, ipHash: `ip-${id}` });
+  const sharedEmail = [base("E-1"), base("E-2"), base("E-3")].map((account) => ({ ...account, emailHash: "hmac:email-shared" }));
+  const redemptions: CouponRedemption[] = sharedEmail.map((account) => ({ accountId: account.id, code: "NEW500", discountInr: 500, redeemedAt: account.createdAt }));
+  assert.ok(scoreRings(sharedEmail, redemptions)[0].evidence.some((item) => item.kind === "email"));
+
+  const referralOnly = [base("R-1"), base("R-2"), base("R-3")].map((account) => ({ ...account, referralCode: "FRIEND500" }));
+  assert.equal(scoreRings(referralOnly, []).length, 0);
+});

@@ -23,6 +23,10 @@ function loadCheckout() {
 export default function TestCheckoutPage() {
   const [accountId, setAccountId] = useState("test-customer-1");
   const [couponCode, setCouponCode] = useState("NEW500");
+  const [email, setEmail] = useState("shared-customer@example.test");
+  const [phone, setPhone] = useState("9000000000");
+  const [deliveryAddress, setDeliveryAddress] = useState("42 Demo Street, Bengaluru");
+  const [referralCode, setReferralCode] = useState("FRIEND500");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +35,7 @@ export default function TestCheckoutPage() {
     setLoading(true); setMessage("");
     try {
       const deviceHash = await browserHash();
-      const response = await fetch("/api/test-checkout/order", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ accountId, couponCode, deviceHash }) });
+      const response = await fetch("/api/test-checkout/order", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ accountId, couponCode, deviceHash, email, phone, deliveryAddress, referralCode }) });
       const order = await response.json() as { error?: string; orderId?: string; amount?: number; currency?: string; keyId?: string };
       if (!response.ok || !order.orderId || !order.keyId) throw new Error(order.error ?? "Could not start the Test Mode payment.");
       await loadCheckout();
@@ -40,5 +44,5 @@ export default function TestCheckoutPage() {
     finally { setLoading(false); }
   }
 
-  return <main className="test-checkout-page"><section className="test-checkout-card"><p>RAZORPAY TEST MODE</p><h1>Make a test payment</h1><span>Use a different customer ID for each signup. Reusing this browser or network gives Sentinel another shared signal to review.</span><form onSubmit={startPayment}><label>Test customer ID<input value={accountId} onChange={(event) => setAccountId(event.target.value)} required /></label><label>Offer code<input value={couponCode} onChange={(event) => setCouponCode(event.target.value)} required /></label><button type="submit" disabled={loading}>{loading ? "Opening checkout…" : "Pay ₹1 in Test Mode"}</button></form>{message && <div role="status">{message}</div>}<small>Sentinel stores hashed browser and network fingerprints only. It never stores card numbers or CVVs.</small></section></main>;
+  return <main className="test-checkout-page"><section className="test-checkout-card"><p>RAZORPAY TEST MODE</p><h1>Make a test payment</h1><span>Use a different customer ID for each signup. Keep the shared test details below to demonstrate connected evidence.</span><form onSubmit={startPayment}><label>Test customer ID<input value={accountId} onChange={(event) => setAccountId(event.target.value)} required /></label><label>Offer code<input value={couponCode} onChange={(event) => setCouponCode(event.target.value)} required /></label><label>Test email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label>Test phone<input inputMode="numeric" value={phone} onChange={(event) => setPhone(event.target.value)} required /></label><label>Delivery address<input value={deliveryAddress} onChange={(event) => setDeliveryAddress(event.target.value)} required /></label><label>Referral code<input value={referralCode} onChange={(event) => setReferralCode(event.target.value)} /></label><button type="submit" disabled={loading}>{loading ? "Opening checkout…" : "Pay ₹1 in Test Mode"}</button></form>{message && <div role="status">{message}</div>}<small>Sentinel stores only HMAC-hashed browser, network, identity, address, and payment fingerprints—never card numbers or CVVs.</small></section></main>;
 }

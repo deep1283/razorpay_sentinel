@@ -12,6 +12,8 @@ const styles: Record<Evidence["kind"], { color: string; label: string }> = {
   payment: { color: "#e69120", label: "Payment token" },
   address: { color: "#dc668f", label: "Delivery address" },
   ip: { color: "#5483e7", label: "Network" },
+  email: { color: "#c65fd6", label: "Email identity" },
+  phone: { color: "#328a95", label: "Phone identity" },
   coupon: { color: "#b56d1e", label: "Promo code" },
   timing: { color: "#8661d4", label: "Redemption timing" },
   referral: { color: "#3193a6", label: "Referral" },
@@ -31,6 +33,9 @@ function plainSignal(signal: Evidence, couponCode: string) {
   if (signal.kind === "payment") return "The signups used the same payment method.";
   if (signal.kind === "address") return "The signups used the same delivery address.";
   if (signal.kind === "ip") return "The signups came from the same network. This can be normal for a home, office, hotel, or mobile network.";
+  if (signal.kind === "email") return "The signups used the same hashed email identity.";
+  if (signal.kind === "phone") return "The signups used the same hashed phone identity.";
+  if (signal.kind === "referral") return "The signups came through the same referral source.";
   if (signal.kind === "timing") return `The signups used ${couponCode} within a short time of each other.`;
   return "The signups share another detail worth checking.";
 }

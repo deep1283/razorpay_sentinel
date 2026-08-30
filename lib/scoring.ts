@@ -5,12 +5,15 @@ import { loadLiveCheckoutData } from "./live-data";
 const signalRules = [
   { key: "deviceHash", kind: "device", label: "Shared browser fingerprint", weight: 30, strength: "strong" as const },
   { key: "paymentTokenHash", kind: "payment", label: "Shared payment instrument", weight: 34, strength: "strong" as const },
+  { key: "emailHash", kind: "email", label: "Shared email identity", weight: 28, strength: "strong" as const },
+  { key: "phoneHash", kind: "phone", label: "Shared phone identity", weight: 28, strength: "strong" as const },
   { key: "addressHash", kind: "address", label: "Shared delivery address", weight: 13, strength: "medium" as const },
   { key: "ipHash", kind: "ip", label: "Shared network fingerprint", weight: 7, strength: "weak" as const },
+  { key: "referralCode", kind: "referral", label: "Shared referral source", weight: 11, strength: "medium" as const },
 ] as const;
 
 function grouped<T extends keyof Account>(input: Account[], key: T) {
-  return input.reduce<Record<string, Account[]>>((map, account) => { (map[String(account[key])] ??= []).push(account); return map; }, {});
+  return input.reduce<Record<string, Account[]>>((map, account) => { const value = account[key]; if (value) (map[String(value)] ??= []).push(account); return map; }, {});
 }
 
 function timeWindowMinutes(input: Account[]) {
@@ -27,7 +30,7 @@ export function riskDecision(score: number): { level: RiskLevel; action: Recomme
 export function scoreRings(input = accounts, inputRedemptions = redemptions): RingCase[] {
   const links = signalRules.map((rule) => ({ ...rule, groups: grouped(input, rule.key) }));
   const candidateByAccounts = new Map<string, Account[]>();
-  for (const link of links.filter((link) => link.kind === "device" || link.kind === "payment")) {
+  for (const link of links.filter((link) => link.kind === "device" || link.kind === "payment" || link.kind === "email" || link.kind === "phone")) {
     for (const members of Object.values(link.groups)) {
       if (members.length >= 3) candidateByAccounts.set(members.map((member) => member.id).sort().join(":"), members);
     }

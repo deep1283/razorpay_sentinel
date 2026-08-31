@@ -12,8 +12,8 @@ function toneFor(ring: RingCase) {
   return "watch";
 }
 
-function plainReason(ring: RingCase) {
-  const signals = ring.evidence.slice(0, 2).map((item) => item.label.toLowerCase());
+export function plainReason(ring: RingCase) {
+  const signals = [...new Set(ring.evidence.map((item) => item.label.toLowerCase()))].slice(0, 2);
   if (signals.length === 0) return "We noticed an unusual pattern in these orders.";
   return `We noticed ${signals.join(" and ")} across these signups.`;
 }

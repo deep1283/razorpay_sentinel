@@ -5,6 +5,7 @@ import { razorpayOrderId } from "../lib/live-data";
 import { chooseDevelopmentThreshold } from "../lib/evaluation";
 import { REVIEW_THRESHOLD } from "../lib/scoring-config";
 import type { Account, CouponRedemption } from "../lib/domain";
+import { plainReason } from "../components/dashboard-client";
 
 test("high-signal seeded ring is scored without restricting the offer", () => {
   const [ring] = scoreRings();
@@ -51,6 +52,7 @@ test("ready-made demo includes a 12-customer transitive ring", () => {
   assert.equal(ring?.accountIds.length, 12);
   assert.ok(ring?.evidence.some((item) => item.kind === "payment"));
   assert.ok(ring?.evidence.some((item) => item.kind === "referral"));
+  assert.equal(plainReason(ring!), "We noticed shared browser fingerprint and shared payment instrument across these signups.");
 });
 
 test("extracts paid order IDs from Razorpay payment and order webhook payloads", () => {
